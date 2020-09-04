@@ -1,13 +1,15 @@
 package com.samarthanam.digitallibrary.controller;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import java.io.*;
 
 @RestController
 public class PdfRenderController {
@@ -30,5 +32,20 @@ public class PdfRenderController {
 
          return null;
         // TO-DO Implementation
+    }
+
+    @GetMapping(value= "books/v1/audios/{audio_file_name}")
+    public ResponseEntity<InputStreamResource> downloadFile() throws IOException {
+        //below commented line to pull file from cloud
+        //final byte[] data = someservice.downloadFile(cloudkey);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ClassPathResource pdfFile = new ClassPathResource("file_example_MP3_700KB.mp3");
+        return ResponseEntity
+                .ok()
+                .contentLength(pdfFile.contentLength())
+                .contentType(
+                        MediaType.parseMediaType("application/octet-stream"))
+                .body(new InputStreamResource(pdfFile.getInputStream()));
+
     }
 }
