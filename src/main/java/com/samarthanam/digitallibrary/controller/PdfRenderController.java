@@ -14,7 +14,7 @@ import java.io.*;
 @RestController
 public class PdfRenderController {
 
-    @GetMapping(value = "books/v1/pdfs/{pdf_book_id}" ,  produces = "application/pdf")
+    @GetMapping(value = "digital_library/v1/pdfs/{pdf_book_id}" ,  produces = "application/pdf")
     public ResponseEntity<InputStreamResource> renderPdf() throws IOException {
 
         ClassPathResource pdfFile = new ClassPathResource("TaxProof_UserManual_Upload.pdf");
@@ -27,14 +27,14 @@ public class PdfRenderController {
 
     }
 
-    @GetMapping(value = "books/v1/audios/{audio_book_id}" ,  produces = "application/json")
+    @GetMapping(value = "digital_library/v1/audios/{audio_book_id}" ,  produces = "application/json")
     public ResponseEntity<InputStreamResource> renderAudio() throws IOException {
 
          return null;
         // TO-DO Implementation
     }
 
-    @GetMapping(value= "books/v1/audios/{audio_file_name}")
+    @GetMapping(value= "digital_library/v1/audios/{audio_file_name}")
     public ResponseEntity<InputStreamResource> downloadFile() throws IOException {
         //below commented line to pull file from cloud
         //final byte[] data = someservice.downloadFile(cloudkey);
