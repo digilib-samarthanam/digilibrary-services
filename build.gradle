@@ -10,18 +10,26 @@ sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
+	maven { url "http://jcenter.bintray.com"}
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compile "org.springframework.boot:spring-boot-starter-data-jpa:2.1.6.RELEASE"
+
+
+
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
 	// https://mvnrepository.com/artifact/commons-codec/commons-codec
 	compile group: 'commons-codec', name: 'commons-codec', version: '1.14'
-	
+
+	compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1212'
+
 	//lombok
 	compileOnly 'org.projectlombok:lombok:1.18.12'
 	annotationProcessor 'org.projectlombok:lombok:1.18.12'
@@ -30,3 +38,4 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
 
 }
+
