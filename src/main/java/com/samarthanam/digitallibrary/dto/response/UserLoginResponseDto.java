@@ -2,11 +2,11 @@ package com.samarthanam.digitallibrary.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-public class UserSignupResponseDto {
+public class UserLoginResponseDto {
 
-    private String  message;
+    private final long timeStamp = System.currentTimeMillis();
+    private String token;
 }

@@ -5,7 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.util.Base64;
+import java.util.UUID;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class UserUtil {
 
 
@@ -16,4 +20,5 @@ public class UserUtil {
         String encodedSalt = Base64.getEncoder().encodeToString(salt.getBytes(Charset.forName("UTF-8")));
         return DigestUtils.sha256Hex(data + encodedSalt);
     }
+
 }

@@ -10,5 +10,6 @@ public class UserSignupRequestDto {
     private String mobileNumber;
     private String emailAddress;
     private String password;
+    private String gender;
 
 }
