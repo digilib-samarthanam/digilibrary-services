@@ -26,43 +26,7 @@ public class UserController {
     private UserService userService;
 
 
-    @Autowired
-    UserValidation userValidation;
 
-    @RequestMapping(path = "/signup", consumes = "application/json", method = RequestMethod.POST)
-    public ResponseEntity<UserSignupResponseDto> signUpUser(@RequestBody User userDetails) throws Exception {
-
-        ErrorDetails errorDetails = new ErrorDetails();
-
-        if(Objects.isNull(userDetails)){
-            errorDetails=  new ErrorDetails("User Details are not found!", "USER_201");
-            return new ResponseEntity(errorDetails, HttpStatus.NO_CONTENT);
-        }
-
-      errorDetails = userValidation.userPostValidation(userDetails);
-
-        if(!StringUtils.isBlank(errorDetails.getMessage())){
-            return new ResponseEntity(errorDetails, HttpStatus.BAD_REQUEST);
-
-        }
-
-            try {
-                userService.signUp(userDetails);
-            }catch (Exception ex)
-            {
-                return new ResponseEntity(ex.getMessage(), HttpStatus.CREATED);
-
-            }
-
-//        if (StringUtils.isBlank(userSignupRequestDto.getFirstName()) || StringUtils.isBlank(userSignupRequestDto.getEmailAddress())
-//        || StringUtils.isBlank(userSignupRequestDto.getPassword())) {
-//            //TODO: throw bad request exception
-//        }
-//        User user = new User(userSignupRequestDto.getFirstName(), userSignupRequestDto.getLastName(),
-//                userSignupRequestDto.getMobileNumber(), userSignupRequestDto.getEmailAddress(), userSignupRequestDto.getPassword());
-//        UserSignupResponseDto userSignupResponseDto = userService.signUp(user);
-        return new ResponseEntity(" user account created", HttpStatus.CREATED);
-    }
 
 
 }
