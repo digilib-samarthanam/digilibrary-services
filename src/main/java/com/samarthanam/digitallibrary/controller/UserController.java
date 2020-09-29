@@ -7,22 +7,19 @@ import com.samarthanam.digitallibrary.dto.request.UserSignupRequestDto;
 import com.samarthanam.digitallibrary.dto.response.UserLoginResponseDto;
 import com.samarthanam.digitallibrary.dto.response.UserSignupResponseDto;
 import com.samarthanam.digitallibrary.dto.response.VerifySignUpResponseDto;
-import com.samarthanam.digitallibrary.exception.ConflictException;
-import com.samarthanam.digitallibrary.exception.TokenCreationException;
-import com.samarthanam.digitallibrary.exception.TokenExpiredException;
-import com.samarthanam.digitallibrary.exception.TokenTemperedException;
-import com.samarthanam.digitallibrary.exception.UnauthorizedException;
+import com.samarthanam.digitallibrary.exception.*;
 import com.samarthanam.digitallibrary.service.UserService;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@Controller
+@EnableSwagger2
+@ApiOperation("User management")
+@RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping(value = "/user")
 public class UserController {
 
@@ -37,7 +34,7 @@ public class UserController {
             throws ConflictException, TokenCreationException {
 
         if (StringUtils.isBlank(userSignupRequestDto.getFirstName()) || StringUtils.isBlank(userSignupRequestDto.getEmailAddress())
-        || StringUtils.isBlank(userSignupRequestDto.getPassword())) {
+                || StringUtils.isBlank(userSignupRequestDto.getPassword())) {
             //TODO: throw bad request exception
         }
         UserSignupResponseDto userSignupResponseDto = userService.signUp(userSignupRequestDto);
