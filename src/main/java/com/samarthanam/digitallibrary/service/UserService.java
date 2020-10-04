@@ -1,27 +1,23 @@
 package com.samarthanam.digitallibrary.service;
 
-import java.util.Optional;
-
+import com.samarthanam.digitallibrary.constant.ServiceConstants;
+import com.samarthanam.digitallibrary.dto.VerifySignUpDto;
+import com.samarthanam.digitallibrary.dto.request.ForgotPasswordRequestDto;
+import com.samarthanam.digitallibrary.dto.request.UpdatePasswordRequestDto;
 import com.samarthanam.digitallibrary.dto.request.UserLoginRequestDto;
-import com.samarthanam.digitallibrary.dto.response.UserLoginResponseDto;
+import com.samarthanam.digitallibrary.dto.request.UserSignupRequestDto;
+import com.samarthanam.digitallibrary.dto.response.*;
+import com.samarthanam.digitallibrary.entity.User;
+import com.samarthanam.digitallibrary.exception.*;
+import com.samarthanam.digitallibrary.model.EmailVerificationToken;
+import com.samarthanam.digitallibrary.model.ForgotPasswordToken;
 import com.samarthanam.digitallibrary.model.UserLoginToken;
+import com.samarthanam.digitallibrary.repository.UserRepository;
+import com.samarthanam.digitallibrary.util.UserUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.samarthanam.digitallibrary.constant.ServiceConstants;
-import com.samarthanam.digitallibrary.dto.VerifySignUpDto;
-import com.samarthanam.digitallibrary.dto.request.UserSignupRequestDto;
-import com.samarthanam.digitallibrary.dto.response.UserSignupResponseDto;
-import com.samarthanam.digitallibrary.dto.response.VerifySignUpResponseDto;
-import com.samarthanam.digitallibrary.entity.User;
-import com.samarthanam.digitallibrary.exception.ConflictException;
-import com.samarthanam.digitallibrary.exception.TokenCreationException;
-import com.samarthanam.digitallibrary.exception.TokenExpiredException;
-import com.samarthanam.digitallibrary.exception.TokenTemperedException;
-import com.samarthanam.digitallibrary.exception.UnauthorizedException;
-import com.samarthanam.digitallibrary.model.EmailVerificationToken;
-import com.samarthanam.digitallibrary.repository.UserRepository;
-import com.samarthanam.digitallibrary.util.UserUtil;
+import java.util.Optional;
 
 import static com.samarthanam.digitallibrary.enums.ServiceError.*;
 
@@ -43,8 +39,7 @@ public class UserService {
 
     public UserSignupResponseDto signUp(UserSignupRequestDto userSignupRequestDto) throws ConflictException, TokenCreationException {
 
-        User user = findByEmailAddressOrMobileNumber(userSignupRequestDto.getEmailAddress(),
-                userSignupRequestDto.getMobileNumber());
+        User user = findByEmailAddress(userSignupRequestDto.getEmailAddress());
         if (user != null && user.isEmailVerified()) {
             throw new ConflictException(USER_ALREADY_EXIST);
         } else if (user != null && !user.isEmailVerified()) {
@@ -80,7 +75,7 @@ public class UserService {
         if (dbUser != null && encryptedPassword.equals(dbUser.getUserPassword())) {
             if (dbUser.isEmailVerified()) {
                 UserLoginToken userLoginToken = new UserLoginToken(dbUser.getFirstName(), dbUser.getLastName(),
-                        dbUser.getGender(), dbUser.getMobileNumber(), dbUser.getEmailAddress(), dbUser.getUserSeqId());
+                        dbUser.getGender(), dbUser.getEmailAddress(), dbUser.getUserSeqId());
                 String token = tokenService.createJwtToken(userLoginToken);
                 return new UserLoginResponseDto(token);
             } else {
@@ -91,12 +86,30 @@ public class UserService {
         }
     }
 
-    private User findByEmailAddressOrMobileNumber(String emailAddress, String mobileNumber) {
-        User dbUser = userRepository.findByEmailAddress(emailAddress);
-        if (dbUser == null) {
-            dbUser = userRepository.findByMobileNumber(mobileNumber);
+    public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException {
+        ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken(forgotPasswordRequestDto.getEmail());
+        String token = tokenService.createJwtToken(forgotPasswordToken);
+        //TODO: service to send email sendEmailToUser(token)
+        return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id: " + token);
+    }
+
+    public UpdatePasswordResponseDto updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, String token)
+            throws Exception {
+        //validate token
+        ForgotPasswordToken forgotPasswordToken = (ForgotPasswordToken) tokenService.decodeJwtToken(token, ForgotPasswordToken.class);
+        String encryptedPassword = UserUtil.encryptPassword(updatePasswordRequestDto.getPassword(), salt);
+        //try to update password
+        User dbUser = userRepository.findByEmailAddress(forgotPasswordToken.getEmail());
+        if(dbUser != null){
+            userRepository.updateUserPassword(forgotPasswordToken.getEmail(), encryptedPassword);
+            return new UpdatePasswordResponseDto("Password has been reset, please login via app");
+        } else {
+            throw new UserNotFoundException(USER_NOT_FOUND);
         }
-        return dbUser;
+    }
+
+    private User findByEmailAddress(String emailAddress) {
+        return userRepository.findByEmailAddress(emailAddress);
     }
 
     private void updateExistingUser(UserSignupRequestDto userSignupRequestDto, User existingUser) {
@@ -104,7 +117,6 @@ public class UserService {
         existingUser.setUserPassword(encryptedPassword);
         existingUser.setFirstName(userSignupRequestDto.getFirstName());
         existingUser.setLastName(userSignupRequestDto.getLastName());
-        existingUser.setMobileNumber(userSignupRequestDto.getMobileNumber());
         existingUser.setEmailAddress(userSignupRequestDto.getEmailAddress());
         existingUser.setGender(userSignupRequestDto.getGender());
         existingUser.setUpdateDate(System.currentTimeMillis());
@@ -123,7 +135,6 @@ public class UserService {
                 .firstName(userSignupRequestDto.getFirstName())
                 .lastName(userSignupRequestDto.getLastName())
                 .emailAddress(userSignupRequestDto.getEmailAddress())
-                .mobileNumber(userSignupRequestDto.getMobileNumber())
                 .gender(userSignupRequestDto.getGender())
                 .emailVerified(false)
                 .adminApproved(false)
