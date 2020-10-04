@@ -2,11 +2,11 @@ package com.samarthanam.digitallibrary.controller;
 
 import com.samarthanam.digitallibrary.constant.RequestConstants;
 import com.samarthanam.digitallibrary.dto.VerifySignUpDto;
+import com.samarthanam.digitallibrary.dto.request.ForgotPasswordRequestDto;
+import com.samarthanam.digitallibrary.dto.request.UpdatePasswordRequestDto;
 import com.samarthanam.digitallibrary.dto.request.UserLoginRequestDto;
 import com.samarthanam.digitallibrary.dto.request.UserSignupRequestDto;
-import com.samarthanam.digitallibrary.dto.response.UserLoginResponseDto;
-import com.samarthanam.digitallibrary.dto.response.UserSignupResponseDto;
-import com.samarthanam.digitallibrary.dto.response.VerifySignUpResponseDto;
+import com.samarthanam.digitallibrary.dto.response.*;
 import com.samarthanam.digitallibrary.exception.*;
 import com.samarthanam.digitallibrary.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +54,20 @@ public class UserController {
             throws UnauthorizedException, TokenCreationException {
         UserLoginResponseDto userLoginResponseDto = userService.login(userLoginRequestDto);
         return new ResponseEntity<>(userLoginResponseDto, HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(path = RequestConstants.FORGOT_PASSWORD_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
+    public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException {
+        ForgotPasswordResponseDto forgotPasswordResponseDto = userService.forgotPassword(forgotPasswordRequestDto);
+        return new ResponseEntity<>(forgotPasswordResponseDto, HttpStatus.ACCEPTED);
+    }
+
+    @RequestMapping(path = RequestConstants.UPDATE_PASSWORD_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
+    public ResponseEntity<UpdatePasswordResponseDto> updatePassword(@RequestBody UpdatePasswordRequestDto updatePasswordRequestDto,
+                                                                    @RequestHeader(name = "token", required = true) String token)
+            throws Exception {
+        UpdatePasswordResponseDto updatePasswordResponseDto = userService.updatePassword(updatePasswordRequestDto, token);
+        return new ResponseEntity<>(updatePasswordResponseDto, HttpStatus.OK);
     }
 
 }

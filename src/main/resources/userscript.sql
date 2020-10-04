@@ -1,14 +1,16 @@
-CREATE TABLE public.users (
-  first_name varchar(120) NOT NULL,
-  last_name varchar(120) NULL,
-  mobile_number varchar(10) NULL,
-  email_address varchar(120) NOT NULL,
-  user_password varchar(120) NOT NULL,
-  gender CHAR(1) NOT NULL DEFAULT 'N',
-  email_verified bool NOT NULL DEFAULT false,
-  admin_approved bool NOT NULL DEFAULT true,
-  created_date BIGINT NOT NULL,
-  updated_date BIGINT NULL,
-  user_seq_id serial NOT NULL,
-  CONSTRAINT users_pk PRIMARY KEY (user_seq_id)
+-- auto-generated definition
+create table users
+(
+  first_name     varchar(120)               not null,
+  last_name      varchar(120),
+  email_address  varchar(120)               not null,
+  user_password  varchar(120)               not null,
+  gender         char default 'N' :: bpchar not null,
+  email_verified boolean default false      not null,
+  admin_approved boolean default true       not null,
+  created_date   bigint                     not null,
+  updated_date   bigint,
+  user_seq_id    serial                     not null
+    constraint users_pk
+    primary key
 );

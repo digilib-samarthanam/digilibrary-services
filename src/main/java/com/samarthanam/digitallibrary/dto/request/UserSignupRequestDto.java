@@ -7,7 +7,6 @@ public class UserSignupRequestDto {
 
     private String firstName;
     private String lastName;
-    private String mobileNumber;
     private String emailAddress;
     private String password;
     private String gender;

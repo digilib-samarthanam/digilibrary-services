@@ -17,9 +17,6 @@ public class UserLoginToken extends AbstractToken {
     @JsonProperty("gender")
     private final String gender;
 
-    @JsonProperty("mobileNumber")
-    private final String mobileNumber;
-
     @JsonProperty("emailAddress")
     private final String emailAddress;
 

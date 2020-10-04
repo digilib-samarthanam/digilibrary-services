@@ -34,9 +34,6 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "mobile_number")
-    private String mobileNumber;
-
     @Column(name = "email_address")
     private String emailAddress;
 
