@@ -33,7 +33,6 @@ curl --location --request POST 'http://localhost:8080/user/signup' \
 --data-raw '{
     "firstName": "jon",
     "lastName": "doe",
-    "mobileNumber": "999999998",
     "emailAddress": "jon@gmail.com",
     "password": "hello",
     "gender": "F"
@@ -54,6 +53,29 @@ curl --location --request POST 'http://localhost:8080/user/login' \
 --data-raw '{
     "email": "jon@gmail.com",
     "password": "hello"
+}'
+```
+
+### forgot password
+
+```
+curl --location --request POST 'http://localhost:8080/user/password/forgot' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: JSESSIONID=2A8722AF0263477D4EC8AE5C8024F173' \
+--data-raw '{
+    "email": "ruta@gmail.com"
+}'
+```
+
+### update password
+
+```
+curl --location --request POST 'http://localhost:8080/user/password/update' \
+--header 'token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjoie1wiZW1haWxcIjpcInJ1dGFAZ21haWwuY29tXCJ9IiwiaXNzIjoiU2FtYXJ0aGFuYW0tRGlnaS1MaWJyYXJ5IiwiZXhwIjoxNjAxNzI0MzA1LCJqdGkiOiJiN2E0NTkxNy02NTA2LTQxM2EtOGZkZi03YWNlOWIzODZiM2EifQ.nL044gb7QWnxzi6kTP92vPd4ezvmShyGK7W73b01ZIk' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: JSESSIONID=2A8722AF0263477D4EC8AE5C8024F173' \
+--data-raw '{
+    "password": "mynameisruta"
 }'
 ```
 
