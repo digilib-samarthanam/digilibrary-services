@@ -108,7 +108,7 @@ public class UserService {
         Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD);
         EmailSenderDto emailSenderDto = new EmailSenderDto(forgotPasswordRequestDto.getEmail(), EmailTemplate.FORGOT_PASSWORD, templateData);
         emailSenderService.sendEmailToUser(emailSenderDto);
-        return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id: " + token);
+        return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id");
     }
 
     public UpdatePasswordResponseDto updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, String token)
