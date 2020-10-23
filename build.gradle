@@ -38,4 +38,6 @@ dependencies {
 	//swagger ui
 	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
+	compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.881'
 }
