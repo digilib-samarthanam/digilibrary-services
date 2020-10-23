@@ -1,6 +1,7 @@
 package com.samarthanam.digitallibrary.service;
 
 import com.samarthanam.digitallibrary.constant.ServiceConstants;
+import com.samarthanam.digitallibrary.dto.EmailSenderDto;
 import com.samarthanam.digitallibrary.dto.VerifySignUpDto;
 import com.samarthanam.digitallibrary.dto.request.ForgotPasswordRequestDto;
 import com.samarthanam.digitallibrary.dto.request.UpdatePasswordRequestDto;
@@ -8,6 +9,7 @@ import com.samarthanam.digitallibrary.dto.request.UserLoginRequestDto;
 import com.samarthanam.digitallibrary.dto.request.UserSignupRequestDto;
 import com.samarthanam.digitallibrary.dto.response.*;
 import com.samarthanam.digitallibrary.entity.User;
+import com.samarthanam.digitallibrary.enums.EmailTemplate;
 import com.samarthanam.digitallibrary.exception.*;
 import com.samarthanam.digitallibrary.model.EmailVerificationToken;
 import com.samarthanam.digitallibrary.model.ForgotPasswordToken;
@@ -17,8 +19,15 @@ import com.samarthanam.digitallibrary.util.UserUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import static com.samarthanam.digitallibrary.constant.RequestConstants.RESET_PASSWORD_LINK;
+import static com.samarthanam.digitallibrary.constant.RequestConstants.SIGNUP_VERIFY_PATH;
+import static com.samarthanam.digitallibrary.constant.ServiceConstants.FORGOT_PASSWORD_LINK;
+import static com.samarthanam.digitallibrary.constant.ServiceConstants.SIGNUP_VERIFY_LINK;
 import static com.samarthanam.digitallibrary.enums.ServiceError.*;
 
 @Service
@@ -26,18 +35,23 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
-
+    private final EmailSenderService emailSenderService;
     private final String salt;
+    private final String hostName;
 
     public UserService(final UserRepository userRepository,
                        final TokenService tokenService,
-                       @Value("${password.salt}") final String salt) {
+                       final EmailSenderService emailSenderService,
+                       @Value("${password.salt}") final String salt,
+                       @Value("${host.name}") String hostName) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
+        this.emailSenderService = emailSenderService;
         this.salt = salt;
+        this.hostName = hostName;
     }
 
-    public UserSignupResponseDto signUp(UserSignupRequestDto userSignupRequestDto) throws ConflictException, TokenCreationException {
+    public UserSignupResponseDto signUp(UserSignupRequestDto userSignupRequestDto) throws ConflictException, TokenCreationException, IOException {
 
         User user = findByEmailAddress(userSignupRequestDto.getEmailAddress());
         if (user != null && user.isEmailVerified()) {
@@ -51,8 +65,10 @@ public class UserService {
         }
         EmailVerificationToken emailVerificationToken = new EmailVerificationToken(user.getUserSeqId());
         String token = tokenService.createJwtToken(emailVerificationToken);
-        //TODO: service to send email sendEmailToUser(token)
-        return new UserSignupResponseDto("Email has been sent to your registered email id, token: " + token);
+        Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.SIGNUP_VERIFY);
+        EmailSenderDto emailSenderDto = new EmailSenderDto(user.getEmailAddress(), EmailTemplate.SIGNUP_VERIFY, templateData);
+        emailSenderService.sendEmailToUser(emailSenderDto);
+        return new UserSignupResponseDto("Email has been sent to your registered email id");
 
     }
 
@@ -89,7 +105,9 @@ public class UserService {
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException {
         ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken(forgotPasswordRequestDto.getEmail());
         String token = tokenService.createJwtToken(forgotPasswordToken);
-        //TODO: service to send email sendEmailToUser(token)
+        Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD);
+        EmailSenderDto emailSenderDto = new EmailSenderDto(forgotPasswordRequestDto.getEmail(), EmailTemplate.FORGOT_PASSWORD, templateData);
+        emailSenderService.sendEmailToUser(emailSenderDto);
         return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id: " + token);
     }
 
@@ -100,7 +118,7 @@ public class UserService {
         String encryptedPassword = UserUtil.encryptPassword(updatePasswordRequestDto.getPassword(), salt);
         //try to update password
         User dbUser = userRepository.findByEmailAddress(forgotPasswordToken.getEmail());
-        if(dbUser != null){
+        if (dbUser != null) {
             userRepository.updateUserPassword(forgotPasswordToken.getEmail(), encryptedPassword);
             return new UpdatePasswordResponseDto("Password has been reset, please login via app");
         } else {
@@ -141,4 +159,19 @@ public class UserService {
                 .createDate(createDate)
                 .build();
     }
+
+    private Map<String, String> getEmailTemplateData(String token, EmailTemplate emailTemplate) {
+        Map<String, String> templateData = new HashMap<>();
+        if (emailTemplate.equals(EmailTemplate.SIGNUP_VERIFY)) {
+            final String verifySignupLink = String.format("http://%s/user%s?token=%s", hostName, SIGNUP_VERIFY_PATH, token);
+            templateData.put(SIGNUP_VERIFY_LINK, verifySignupLink);
+            return templateData;
+        } else if (emailTemplate.equals(EmailTemplate.FORGOT_PASSWORD)) {
+            final String forgotPasswordLink = String.format("http://%s/user%s?token=%s", hostName, RESET_PASSWORD_LINK, token);
+            templateData.put(FORGOT_PASSWORD_LINK, forgotPasswordLink);
+            return templateData;
+        }
+        return templateData;
+    }
+
 }

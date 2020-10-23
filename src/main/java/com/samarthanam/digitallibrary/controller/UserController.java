@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.io.IOException;
+
 @EnableSwagger2
 @ApiOperation("User management")
 @RestController
@@ -31,7 +33,7 @@ public class UserController {
 
     @RequestMapping(path = RequestConstants.SIGNUP_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
     public ResponseEntity<UserSignupResponseDto> signUpUser(@RequestBody UserSignupRequestDto userSignupRequestDto)
-            throws ConflictException, TokenCreationException {
+            throws ConflictException, TokenCreationException, IOException {
 
         if (StringUtils.isBlank(userSignupRequestDto.getFirstName()) || StringUtils.isBlank(userSignupRequestDto.getEmailAddress())
                 || StringUtils.isBlank(userSignupRequestDto.getPassword())) {
