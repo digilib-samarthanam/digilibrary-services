@@ -7,10 +7,10 @@ import lombok.Getter;
 @Getter
 public enum EmailTemplate {
 
-    SIGNUP_VERIFY("signup_verify.html", "Please verify your email"),
-    FORGOT_PASSWORD("forgot_password.html", "A link to change your password!");
+    SIGNUP_VERIFY("templates/email/signup_verify.html", "Please verify your email"),
+    FORGOT_PASSWORD("templates/email/forgot_password.html", "A link to change your password!");
 
-    private final String templateFile;
+    private final String templatePath;
     private final String subject;
 }
 
