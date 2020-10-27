@@ -48,7 +48,7 @@ public class EmailSenderService {
     }
 
     private String getHtmlbody(EmailTemplate emailTemplate) throws IOException {
-        String fileName = emailTemplate.getTemplateFile();
+        String fileName = emailTemplate.getTemplatePath();
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource(fileName).getFile());
         //Read File Content
