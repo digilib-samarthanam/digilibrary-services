@@ -10,10 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -40,6 +40,7 @@ public class EmailSenderService {
             htmlBody = replaceTemplateVariables(emailSenderDto.getTemplateData(), htmlBody);
         } catch (IOException e) {
             log.error("Error reading HTML Template: {}", emailSenderDto.getEmailTemplate());
+            e.printStackTrace();
             //throw EmailNotSentExpection;
             return;
         }
@@ -49,10 +50,25 @@ public class EmailSenderService {
 
     private String getHtmlbody(EmailTemplate emailTemplate) throws IOException {
         String fileName = emailTemplate.getTemplatePath();
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(fileName).getFile());
+//        ClassLoader classLoader = getClass().getClassLoader();
+//        File file = new File(classLoader.getResource(fileName).getFile());
         //Read File Content
-        return new String(Files.readAllBytes(file.toPath()));
+        return EmailSenderService.getResourceFileAsString(fileName);
+    }
+
+    private static String getResourceFileAsString(String fileName) {
+        InputStream is = getResourceFileAsInputStream(fileName);
+        if (is != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            return (String)reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        } else {
+            throw new RuntimeException("resource not found");
+        }
+    }
+
+    private static InputStream getResourceFileAsInputStream(String fileName) {
+        ClassLoader classLoader = EmailSenderService.class.getClassLoader();
+        return classLoader.getResourceAsStream(fileName);
     }
 
     private String replaceTemplateVariables(Map<String, String> dataSet, String htmlBody) {
