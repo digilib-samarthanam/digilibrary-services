@@ -40,4 +40,11 @@ dependencies {
 	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
 	compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.881'
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
+	//compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.887'
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
+	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.885'
+	//implementation 'com.amazonaws:aws-java-sdk:1.11.750'
+	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
+	compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.885'
 }

@@ -163,11 +163,11 @@ public class UserService {
     private Map<String, String> getEmailTemplateData(String token, EmailTemplate emailTemplate) {
         Map<String, String> templateData = new HashMap<>();
         if (emailTemplate.equals(EmailTemplate.SIGNUP_VERIFY)) {
-            final String verifySignupLink = String.format("http://%s/user%s?token=%s", hostName, SIGNUP_VERIFY_PATH, token);
+            final String verifySignupLink = String.format("%s/user%s?token=%s", hostName, SIGNUP_VERIFY_PATH, token);
             templateData.put(SIGNUP_VERIFY_LINK, verifySignupLink);
             return templateData;
         } else if (emailTemplate.equals(EmailTemplate.FORGOT_PASSWORD)) {
-            final String forgotPasswordLink = String.format("http://%s/user%s?token=%s", hostName, RESET_PASSWORD_LINK, token);
+            final String forgotPasswordLink = String.format("%s/user%s?token=%s", hostName, RESET_PASSWORD_LINK, token);
             templateData.put(FORGOT_PASSWORD_LINK, forgotPasswordLink);
             return templateData;
         }
