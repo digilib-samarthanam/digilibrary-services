@@ -53,7 +53,7 @@ public class UserService {
 
     public UserSignupResponseDto signUp(UserSignupRequestDto userSignupRequestDto) throws ConflictException, TokenCreationException, IOException {
 
-        User user = findByEmailAddress(userSignupRequestDto.getEmailAddress());
+        User user = findByEmailAddress(userSignupRequestDto.getEmailAddress().toLowerCase());
         if (user != null && user.isEmailVerified()) {
             throw new ConflictException(USER_ALREADY_EXIST);
         } else if (user != null && !user.isEmailVerified()) {
@@ -87,11 +87,11 @@ public class UserService {
 
     public UserLoginResponseDto login(UserLoginRequestDto userLoginRequestDto) throws TokenCreationException, UnauthorizedException {
         String encryptedPassword = UserUtil.encryptPassword(userLoginRequestDto.getPassword(), salt);
-        User dbUser = userRepository.findByEmailAddress(userLoginRequestDto.getEmail());
+        User dbUser = userRepository.findByEmailAddress(userLoginRequestDto.getEmail().toLowerCase());
         if (dbUser != null && encryptedPassword.equals(dbUser.getUserPassword())) {
             if (dbUser.isEmailVerified()) {
                 UserLoginToken userLoginToken = new UserLoginToken(dbUser.getFirstName(), dbUser.getLastName(),
-                        dbUser.getGender(), dbUser.getEmailAddress(), dbUser.getUserSeqId());
+                        dbUser.getGender(), dbUser.getEmailAddress().toLowerCase(), dbUser.getUserSeqId());
                 String token = tokenService.createJwtToken(userLoginToken);
                 return new UserLoginResponseDto(token);
             } else {
@@ -102,13 +102,19 @@ public class UserService {
         }
     }
 
-    public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException {
-        ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken(forgotPasswordRequestDto.getEmail());
-        String token = tokenService.createJwtToken(forgotPasswordToken);
-        Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD);
-        EmailSenderDto emailSenderDto = new EmailSenderDto(forgotPasswordRequestDto.getEmail(), EmailTemplate.FORGOT_PASSWORD, templateData);
-        emailSenderService.sendEmailToUser(emailSenderDto);
-        return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id");
+    public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException, UserNotFoundException {
+        User dbUser = userRepository.findByEmailAddress(forgotPasswordRequestDto.getEmail().toLowerCase());
+        if (dbUser != null) {
+            ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken(forgotPasswordRequestDto.getEmail().toLowerCase());
+            String token = tokenService.createJwtToken(forgotPasswordToken);
+            Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD);
+            EmailSenderDto emailSenderDto = new EmailSenderDto(forgotPasswordRequestDto.getEmail().toLowerCase(), EmailTemplate.FORGOT_PASSWORD, templateData);
+            emailSenderService.sendEmailToUser(emailSenderDto);
+            return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id");
+
+        } else {
+            throw new UserNotFoundException(USER_NOT_FOUND);
+        }
     }
 
     public UpdatePasswordResponseDto updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, String token)
@@ -117,9 +123,9 @@ public class UserService {
         ForgotPasswordToken forgotPasswordToken = (ForgotPasswordToken) tokenService.decodeJwtToken(token, ForgotPasswordToken.class);
         String encryptedPassword = UserUtil.encryptPassword(updatePasswordRequestDto.getPassword(), salt);
         //try to update password
-        User dbUser = userRepository.findByEmailAddress(forgotPasswordToken.getEmail());
+        User dbUser = userRepository.findByEmailAddress(forgotPasswordToken.getEmail().toLowerCase());
         if (dbUser != null) {
-            userRepository.updateUserPassword(forgotPasswordToken.getEmail(), encryptedPassword);
+            userRepository.updateUserPassword(forgotPasswordToken.getEmail().toLowerCase(), encryptedPassword);
             return new UpdatePasswordResponseDto("Password has been reset, please login via app");
         } else {
             throw new UserNotFoundException(USER_NOT_FOUND);
@@ -135,7 +141,7 @@ public class UserService {
         existingUser.setUserPassword(encryptedPassword);
         existingUser.setFirstName(userSignupRequestDto.getFirstName());
         existingUser.setLastName(userSignupRequestDto.getLastName());
-        existingUser.setEmailAddress(userSignupRequestDto.getEmailAddress());
+        existingUser.setEmailAddress(userSignupRequestDto.getEmailAddress().toLowerCase());
         existingUser.setGender(userSignupRequestDto.getGender());
         existingUser.setUpdateDate(System.currentTimeMillis());
     }
@@ -152,7 +158,7 @@ public class UserService {
                 .userPassword(encryptedPassword)
                 .firstName(userSignupRequestDto.getFirstName())
                 .lastName(userSignupRequestDto.getLastName())
-                .emailAddress(userSignupRequestDto.getEmailAddress())
+                .emailAddress(userSignupRequestDto.getEmailAddress().toLowerCase())
                 .gender(userSignupRequestDto.getGender())
                 .emailVerified(false)
                 .adminApproved(false)

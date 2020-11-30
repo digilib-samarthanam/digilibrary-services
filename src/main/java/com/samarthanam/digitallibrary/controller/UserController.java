@@ -59,7 +59,8 @@ public class UserController {
     }
 
     @RequestMapping(path = RequestConstants.FORGOT_PASSWORD_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
-    public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException {
+    public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto)
+            throws TokenCreationException, UserNotFoundException {
         ForgotPasswordResponseDto forgotPasswordResponseDto = userService.forgotPassword(forgotPasswordRequestDto);
         return new ResponseEntity<>(forgotPasswordResponseDto, HttpStatus.ACCEPTED);
     }

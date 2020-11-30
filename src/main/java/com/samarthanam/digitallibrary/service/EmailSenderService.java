@@ -22,7 +22,7 @@ public class EmailSenderService {
     // Replace sender@example.com with your "From" address.
     // This address must be verified with Amazon SES.
     //TODO: move to application properties
-    private final String FROM = "ruta.chaudhari@target.com";
+    private final String FROM = "samarthanam.digilibrary@gmail.com";
 
     /**
      * To email will only be sent to the verified emails on aws console if the account is in sandbox.
@@ -96,7 +96,7 @@ public class EmailSenderService {
                                     .withCharset("UTF-8").withData(subject)))
                     .withSource(FROM);
             client.sendEmail(request);
-            log.info("Email sent!");
+            log.info("Email was sent to " + toEmail);
         } catch (Exception ex) {
             log.error("The email was not sent. Error message: {}"
                     , ex.getMessage(), ex);
