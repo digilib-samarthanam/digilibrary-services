@@ -15,7 +15,7 @@ public enum ServiceError {
     RESOURCE_NOT_FOUND("ERR_05", "Requested resource was not found", HttpStatus.INTERNAL_SERVER_ERROR),
     CREDENTIAL_MISMATCH("ERR_06", "INVALID EMAIL/PASSWORD", HttpStatus.UNAUTHORIZED),
     USER_NOT_VERIFIED("ERR_07", "Please verify yourself using email sent", HttpStatus.UNAUTHORIZED),
-    USER_NOT_FOUND("ERR_08", "No user found with this email id", HttpStatus.NOT_FOUND);
+    USER_NOT_FOUND("ERR_08", "No user found with this email id, please check for typos and try again", HttpStatus.NOT_FOUND);
 
     private final String errorCode;
     private final String errorMessage;
