@@ -104,7 +104,7 @@ public class UserService {
 
     public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException, UserNotFoundException {
         User dbUser = userRepository.findByEmailAddress(forgotPasswordRequestDto.getEmail().toLowerCase());
-        if (dbUser != null) {
+        if (dbUser != null && dbUser.isEmailVerified()) {
             ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken(forgotPasswordRequestDto.getEmail().toLowerCase());
             String token = tokenService.createJwtToken(forgotPasswordToken);
             Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD);
@@ -124,7 +124,7 @@ public class UserService {
         String encryptedPassword = UserUtil.encryptPassword(updatePasswordRequestDto.getPassword(), salt);
         //try to update password
         User dbUser = userRepository.findByEmailAddress(forgotPasswordToken.getEmail().toLowerCase());
-        if (dbUser != null) {
+        if (dbUser != null && dbUser.isEmailVerified()) {
             userRepository.updateUserPassword(forgotPasswordToken.getEmail().toLowerCase(), encryptedPassword);
             return new UpdatePasswordResponseDto("Password has been reset, please login via app");
         } else {
@@ -173,7 +173,7 @@ public class UserService {
             templateData.put(SIGNUP_VERIFY_LINK, verifySignupLink);
             return templateData;
         } else if (emailTemplate.equals(EmailTemplate.FORGOT_PASSWORD)) {
-            final String forgotPasswordLink = String.format("%s/user%s?token=%s", hostName, RESET_PASSWORD_LINK, token);
+            final String forgotPasswordLink = String.format("%s%s?token=%s", hostName, RESET_PASSWORD_LINK, token);
             templateData.put(FORGOT_PASSWORD_LINK, forgotPasswordLink);
             return templateData;
         }
