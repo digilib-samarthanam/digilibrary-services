@@ -38,17 +38,20 @@ public class UserService {
     private final EmailSenderService emailSenderService;
     private final String salt;
     private final String hostName;
+    private final String verifyHostName;
 
     public UserService(final UserRepository userRepository,
                        final TokenService tokenService,
                        final EmailSenderService emailSenderService,
                        @Value("${password.salt}") final String salt,
-                       @Value("${host.name}") String hostName) {
+                       @Value("${host.name}") String hostName,
+                       @Value("${host.name.verify}") String verifyHostName) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.emailSenderService = emailSenderService;
         this.salt = salt;
         this.hostName = hostName;
+        this.verifyHostName = verifyHostName;
     }
 
     public UserSignupResponseDto signUp(UserSignupRequestDto userSignupRequestDto) throws ConflictException, TokenCreationException, IOException {
@@ -169,7 +172,7 @@ public class UserService {
     private Map<String, String> getEmailTemplateData(String token, EmailTemplate emailTemplate) {
         Map<String, String> templateData = new HashMap<>();
         if (emailTemplate.equals(EmailTemplate.SIGNUP_VERIFY)) {
-            final String verifySignupLink = String.format("%s/user%s?token=%s", hostName, SIGNUP_VERIFY_PATH, token);
+            final String verifySignupLink = String.format("%s/user%s?token=%s", verifyHostName, SIGNUP_VERIFY_PATH, token);
             templateData.put(SIGNUP_VERIFY_LINK, verifySignupLink);
             return templateData;
         } else if (emailTemplate.equals(EmailTemplate.FORGOT_PASSWORD)) {
