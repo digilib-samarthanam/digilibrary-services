@@ -37,32 +37,9 @@ public class CloudOpsController {
         return new ResponseEntity<>(objectList, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/downloadPDF")
-    public ResponseEntity<ByteArrayResource> downloadPDFFile(@RequestParam(value = "file") String file) throws IOException {
-        byte[] data = service.getFile(file);
-        ByteArrayResource resource = new ByteArrayResource(data);
-
-        return ResponseEntity
-                .ok()
-                .contentLength(data.length)
-                .header("Content-type", "application/pdf")
-                // .header("Content-disposition", "attachment; filename=\"" + file + "\"")
-                .body(resource);
-
-    }
-
-    @GetMapping(path = "/downloadAudio")
-    public ResponseEntity<ByteArrayResource> downloadAudioFile(@RequestParam(value = "file") String file) throws IOException {
-        byte[] data = service.getFile(file);
-        ByteArrayResource resource = new ByteArrayResource(data);
-
-        return ResponseEntity
-                .ok()
-                .contentLength(data.length)
-                .header("Content-type", "application/octet-stream")
-                // .header("Content-disposition", "attachment; filename=\"" + file + "\"")
-                .body(resource);
-
+    @GetMapping(path = "/download")
+    public String downloadFile(@RequestParam(value = "file_name") String fileName) {
+        return service.generatePresignedUrl(fileName);
     }
 
 
