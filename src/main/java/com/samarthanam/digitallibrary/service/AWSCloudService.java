@@ -90,6 +90,7 @@ public class AWSCloudService {
 
     public String generatePresignedUrl(String fileName) {
 
+        logger.info(() -> String.format("Generating Presigned Url for %s", fileName));
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
                 new GeneratePresignedUrlRequest("samarthanampersonaldevelopment", fileName, HttpMethod.GET)
                         .withExpiration(Date.from(LocalDateTime.now()
