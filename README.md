@@ -1,5 +1,9 @@
-# digital library services
+# Digital Library Services
 Micro services project springboot
+
+### Swagger UI URL  
+http://host/swagger-ui/ e.g.- http://localhost:8080/swagger-ui/
+
 
 # Build
 ### Gradle

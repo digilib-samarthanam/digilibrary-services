@@ -24,19 +24,18 @@ public class CloudOpsController {
 
     @PostMapping(value = "/upload")
     public ResponseEntity<String> uploadFile(@RequestPart(value = "file") final MultipartFile multipartFile) {
+
         service.uploadFile(multipartFile);
         final String response = "[" + multipartFile.getOriginalFilename() + "] uploaded successfully.";
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/buckets/{bucket_name}")
-    public ResponseEntity<List> getBucketObjects(@PathVariable("bucket_name") String bucket_name) {
-        List<String> objectList = service.getObjects(bucket_name);
-
-        return new ResponseEntity<>(objectList, HttpStatus.OK);
+    public List<String> getBucketObjects(@PathVariable("bucket_name") String bucketName) {
+        return service.getObjects(bucketName);
     }
 
-    @GetMapping(path = "/download")
+    @GetMapping(path = "/download_url")
     public String downloadFile(@RequestParam(value = "file_name") String fileName) {
         return service.generatePresignedUrl(fileName);
     }

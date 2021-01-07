@@ -14,11 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.IOException;
 
-@EnableSwagger2
 @ApiOperation("User management")
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
