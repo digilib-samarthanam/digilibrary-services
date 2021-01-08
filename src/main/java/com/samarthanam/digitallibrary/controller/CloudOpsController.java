@@ -36,7 +36,7 @@ public class CloudOpsController {
     }
 
     @GetMapping(path = "/download_url")
-    public String downloadFile(@RequestParam(value = "file_name") String fileName) {
+    public String getDownloadUrl(@RequestParam(value = "file_name") String fileName) {
         return service.generatePresignedUrl(fileName);
     }
 
