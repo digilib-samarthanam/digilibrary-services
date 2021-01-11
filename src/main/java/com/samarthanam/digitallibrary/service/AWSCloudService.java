@@ -1,6 +1,7 @@
 package com.samarthanam.digitallibrary.service;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
@@ -13,7 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -21,10 +25,10 @@ import java.util.logging.Logger;
 @Component
 public class AWSCloudService {
 
-    Logger logger = Logger.getLogger(AWSCloudService.class.getName());
+    private static Logger logger = Logger.getLogger(AWSCloudService.class.getName());
 
     @Autowired
-    AmazonS3 amazonS3;
+    private AmazonS3 amazonS3;
 
     /*@Value("${s3.buckek.name}")
     String defaultBucketName;
@@ -84,17 +88,16 @@ public class AWSCloudService {
         return keyList;
     }
 
-    public byte[] getFile(String file) {
-        S3Object obj = amazonS3.getObject("samarthanampersonaldevelopment", file);
-        S3ObjectInputStream stream = obj.getObjectContent();
-        try {
-            byte[] content = IOUtils.toByteArray(stream);
-            obj.close();
-            return content;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public String generatePresignedUrl(String fileName) {
+
+        logger.info(() -> String.format("Generating Presigned Url for %s", fileName));
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest("samarthanampersonaldevelopment", fileName, HttpMethod.GET)
+                        .withExpiration(Date.from(LocalDateTime.now()
+                                                          .plusMinutes(60l)
+                                                          .atZone(ZoneId.of("Asia/Kolkata"))
+                                                          .toInstant()));
+        return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
     }
 
 
