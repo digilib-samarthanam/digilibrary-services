@@ -95,7 +95,7 @@ public class AWSCloudService {
                 new GeneratePresignedUrlRequest("samarthanampersonaldevelopment", fileName, HttpMethod.GET)
                         .withExpiration(Date.from(LocalDateTime.now()
                                                           .plusMinutes(60l)
-                                                          .atZone(ZoneId.of("Asia/Kolkata"))
+                                                          .atZone(ZoneId.systemDefault())
                                                           .toInstant()));
         return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
     }
