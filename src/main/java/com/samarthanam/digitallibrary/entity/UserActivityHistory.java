@@ -24,9 +24,6 @@ public class UserActivityHistory {
     @Column(name = "isbn")
     private Integer isbn;
 
-    @Column(name = "isbn")
-    private Integer isbn;
-
     @Column(name = "current_page")
     private Integer currentPage;
 
