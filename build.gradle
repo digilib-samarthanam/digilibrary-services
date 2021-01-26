@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.1'
+	id 'org.springframework.boot' version '2.4.2'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
 }
@@ -34,7 +34,7 @@ dependencies {
 	compile group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
-	compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.933'
+	compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.942'
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
-	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.933'
+	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.942'
 }
