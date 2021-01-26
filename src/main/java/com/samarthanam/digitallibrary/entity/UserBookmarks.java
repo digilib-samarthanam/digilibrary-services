@@ -24,6 +24,6 @@ public class UserBookmarks {
     private Integer isbn;
 
     @Column(name = "crte_ts")
-    private LocalDateTime createTimestamp;
+    private LocalDateTime createdTimestamp;
 
 }

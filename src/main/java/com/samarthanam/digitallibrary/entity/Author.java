@@ -33,10 +33,10 @@ public class Author {
     private String dod;
 
     @Column(name = "update_ts")
-    private LocalDateTime updateTimestamp;
+    private LocalDateTime updatedTimestamp;
 
     @Column(name = "create_ts")
-    private LocalDateTime createTimestamp;
+    private LocalDateTime createdTimestamp;
 
 
 }

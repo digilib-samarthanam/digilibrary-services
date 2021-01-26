@@ -37,8 +37,8 @@ public class UserActivityHistory {
     private LocalTime audioTime;
 
     @Column(name = "crte_ts")
-    private LocalDateTime createTimestamp;
+    private LocalDateTime createdTimestamp;
 
     @Column(name = "updt_ts")
-    private LocalDateTime updateTimestamp;
+    private LocalDateTime updatedTimestamp;
 }
