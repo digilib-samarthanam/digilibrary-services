@@ -1,5 +1,6 @@
 package com.samarthanam.digitallibrary.controller;
 
+import com.samarthanam.digitallibrary.dto.response.HomePageResponse;
 import com.samarthanam.digitallibrary.entity.Book;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
@@ -24,11 +25,11 @@ public class BooksController {
 
 
     @GetMapping("/recently_added_books")
-    public List<Book> recentlyAddedBoks(
+    public List<Book> recentlyAddedBooks(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
 
-        return bookService.recentlyAddedBoks(page, perPage);
+        return bookService.recentlyAddedBooks(page, perPage);
     }
 
     @GetMapping("/users/{user_id}/bookmarked_books")
@@ -47,6 +48,19 @@ public class BooksController {
             @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
 
         return usersBookService.usersRecentlyViewedBooks(userId, page, perPage);
+    }
+
+    @GetMapping("/books")
+    public HomePageResponse getHomePageContent(
+            @RequestParam(name = "user_id", required = false) Integer userId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
+
+        return HomePageResponse.builder()
+                .recentlyViewedBooks(userId == null ? null : usersBookService.usersRecentlyViewedBooks(userId, page, perPage))
+                .bookmarkedBooks(userId == null ? null : usersBookService.usersBookmarkedBooks(userId, page, perPage))
+                .recentlyAddedBooks(bookService.recentlyAddedBooks(page, perPage))
+                .build();
     }
 
 }

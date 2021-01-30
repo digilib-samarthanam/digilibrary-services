@@ -16,7 +16,7 @@ public class BookService {
     @Autowired
     private BooksRepository booksRepository;
 
-    public List<Book> recentlyAddedBoks(int page, int perPage) {
+    public List<Book> recentlyAddedBooks(int page, int perPage) {
         return booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
     }
 
