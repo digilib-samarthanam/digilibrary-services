@@ -2,10 +2,7 @@ package com.samarthanam.digitallibrary.entity;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,8 +17,9 @@ public class UserBookmarks {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "isbn")
-    private Integer isbn;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "isbn")
+    private Book book;
 
     @Column(name = "crte_ts")
     private LocalDateTime createdTimestamp;
