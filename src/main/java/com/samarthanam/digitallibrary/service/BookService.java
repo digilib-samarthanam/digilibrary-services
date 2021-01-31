@@ -17,6 +17,7 @@ public class BookService {
     private BooksRepository booksRepository;
 
     public List<Book> recentlyAddedBooks(int page, int perPage) {
+        log.info("Querying recently added books from database");
         return booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
     }
 

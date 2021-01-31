@@ -22,10 +22,12 @@ public class UsersBookService {
     private UserActivityHistoryRepository userActivityHistoryRepository;
 
     public List<UserBookmarks> usersBookmarkedBooks(Integer userId, int page, int perPage) {
+        log.info(String.format("Querying bookmarked books for user_id = %d from database", userId));
         return userBookmarksRepository.findByUserIdOrderByCreatedTimestampDesc(userId, PageRequest.of(page, perPage));
     }
 
     public List<UserActivityHistory> usersRecentlyViewedBooks(Integer userId, int page, int perPage) {
+        log.info(String.format("Querying recently viewed books for user_id = %d from database", userId));
         return userActivityHistoryRepository.findByUserIdOrderByUpdatedTimestamp(userId, PageRequest.of(page, perPage));
     }
 
