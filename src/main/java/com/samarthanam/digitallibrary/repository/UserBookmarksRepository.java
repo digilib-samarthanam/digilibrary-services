@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface UserBookmarksRepository extends JpaRepository<UserBookmarks, Integer> {
 
-    @EntityGraph(attributePaths = "book.author")
+    @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookType" })
     List<UserBookmarks> findByUserIdOrderByCreatedTimestampDesc(Integer userId, Pageable pageRequest);
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface UserActivityHistoryRepository extends JpaRepository<UserActivityHistory, Integer> {
 
-    @EntityGraph(attributePaths = "book.author")
+    @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookType" })
     List<UserActivityHistory> findByUserIdOrderByUpdatedTimestamp(Integer userId, Pageable pageRequest);
 
 }

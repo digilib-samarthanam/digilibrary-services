@@ -22,14 +22,16 @@ public class Book {
     @Column(name = "isbn")
     private Integer isbn;
 
-    @Column(name = "category_id")
-    private Integer categoryId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(name = "book_status_id")
     private Integer bookStatusId;
 
-    @Column(name = "book_type_code")
-    private Integer bookTypeCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_type_code")
+    private BookType bookType;
 
     @Column(name = "title")
     private String title;

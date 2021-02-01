@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface BooksRepository extends JpaRepository<Book, Integer> {
 
-    @EntityGraph(attributePaths = "author")
+    @EntityGraph(attributePaths = { "author", "category", "bookType" })
     List<Book> findAllByOrderByCreatedTimestampDesc(Pageable pageRequest);
 
 }
