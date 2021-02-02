@@ -11,11 +11,18 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	lombokVersion = '1.18.16'
+	mapstructVersion = '1.4.1.Final'
+	awsSDKVersion = '1.11.942'
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+	compile 'org.springframework.boot:spring-boot-starter-actuator'
 	compile 'org.springframework.boot:spring-boot-devtools'
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
@@ -23,9 +30,11 @@ dependencies {
 	// https://mvnrepository.com/artifact/commons-codec/commons-codec
 	compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
 
-	//lombok
-	compileOnly 'org.projectlombok:lombok:1.18.16'
-	annotationProcessor 'org.projectlombok:lombok:1.18.16'
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+
+	compileOnly group: 'org.mapstruct', name: 'mapstruct', version: "${mapstructVersion}"
+	annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: "${mapstructVersion}"
 
 	compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
 	compile group: 'com.auth0', name: 'java-jwt', version: '3.12.0'
@@ -35,7 +44,8 @@ dependencies {
 	compile group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
-	compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.942'
+	compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: "${awsSDKVersion}"
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
-	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.942'
+	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: "${awsSDKVersion}"
+
 }
