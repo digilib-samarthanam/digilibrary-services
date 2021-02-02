@@ -1,8 +1,10 @@
 package com.samarthanam.digitallibrary.service;
 
-import com.samarthanam.digitallibrary.entity.Book;
+import com.samarthanam.digitallibrary.dto.response.Book;
 import com.samarthanam.digitallibrary.repository.BooksRepository;
+import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,15 @@ import java.util.List;
 @Slf4j
 public class BookService {
 
+    private static final BooksMapper booksMapper = Mappers.getMapper(BooksMapper.class);
+
     @Autowired
     private BooksRepository booksRepository;
 
     public List<Book> recentlyAddedBooks(int page, int perPage) {
         log.info("Querying recently added books from database");
-        return booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
+        var books = booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
+        return booksMapper.mapToBooks(books);
     }
 
 }
