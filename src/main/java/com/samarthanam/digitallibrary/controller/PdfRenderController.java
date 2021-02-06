@@ -4,12 +4,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+@CrossOrigin(origins = {"http://ec2-13-232-236-83.ap-south-1.compute.amazonaws.com:3000", "http://localhost:3000"}, allowedHeaders = "*")
 @RestController
 public class PdfRenderController {
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 @ApiOperation("Books Management")
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = {"http://ec2-13-232-236-83.ap-south-1.compute.amazonaws.com:3000", "http://localhost:3000"}, allowedHeaders = "*")
 public class BooksController {
 
     @Autowired

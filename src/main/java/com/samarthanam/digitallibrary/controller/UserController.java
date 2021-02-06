@@ -10,16 +10,16 @@ import com.samarthanam.digitallibrary.dto.response.*;
 import com.samarthanam.digitallibrary.exception.*;
 import com.samarthanam.digitallibrary.service.UserService;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 @ApiOperation("User management")
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = {"http://ec2-13-232-236-83.ap-south-1.compute.amazonaws.com:3000", "http://localhost:3000"}, allowedHeaders = "*")
 @RequestMapping(value = "/user")
 public class UserController {
 
@@ -30,14 +30,11 @@ public class UserController {
     }
 
     @RequestMapping(path = RequestConstants.SIGNUP_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
-    public ResponseEntity<UserSignupResponseDto> signUpUser(@RequestBody UserSignupRequestDto userSignupRequestDto)
+    public ResponseEntity<UserSignupResponseDto> signUpUser(@RequestBody @Valid UserSignupRequestDto userSignupRequestDto,
+                                                            @RequestHeader(name = "origin", required = false, defaultValue = "http://localhost:3000") String origin)
             throws ConflictException, TokenCreationException, IOException {
 
-        if (StringUtils.isBlank(userSignupRequestDto.getFirstName()) || StringUtils.isBlank(userSignupRequestDto.getEmailAddress())
-                || StringUtils.isBlank(userSignupRequestDto.getPassword())) {
-            //TODO: throw bad request exception
-        }
-        UserSignupResponseDto userSignupResponseDto = userService.signUp(userSignupRequestDto);
+        UserSignupResponseDto userSignupResponseDto = userService.signUp(userSignupRequestDto, origin);
         return new ResponseEntity<>(userSignupResponseDto, HttpStatus.CREATED);
     }
 
@@ -50,21 +47,22 @@ public class UserController {
     }
 
     @RequestMapping(path = RequestConstants.LOGIN_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
-    public ResponseEntity<UserLoginResponseDto> loginUser(@RequestBody UserLoginRequestDto userLoginRequestDto)
+    public ResponseEntity<UserLoginResponseDto> loginUser(@RequestBody @Valid UserLoginRequestDto userLoginRequestDto)
             throws UnauthorizedException, TokenCreationException {
         UserLoginResponseDto userLoginResponseDto = userService.login(userLoginRequestDto);
         return new ResponseEntity<>(userLoginResponseDto, HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(path = RequestConstants.FORGOT_PASSWORD_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
-    public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto)
-            throws TokenCreationException, UserNotFoundException {
-        ForgotPasswordResponseDto forgotPasswordResponseDto = userService.forgotPassword(forgotPasswordRequestDto);
+    public ResponseEntity<ForgotPasswordResponseDto> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDto forgotPasswordRequestDto,
+                                                                    @RequestHeader(name = "origin", required = false, defaultValue = "http://localhost:3000") String origin)
+    throws TokenCreationException, UserNotFoundException {
+        ForgotPasswordResponseDto forgotPasswordResponseDto = userService.forgotPassword(forgotPasswordRequestDto, origin);
         return new ResponseEntity<>(forgotPasswordResponseDto, HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(path = RequestConstants.UPDATE_PASSWORD_PATH, consumes = RequestConstants.APPLICATION_JSON, method = RequestMethod.POST)
-    public ResponseEntity<UpdatePasswordResponseDto> updatePassword(@RequestBody UpdatePasswordRequestDto updatePasswordRequestDto,
+    public ResponseEntity<UpdatePasswordResponseDto> updatePassword(@RequestBody @Valid UpdatePasswordRequestDto updatePasswordRequestDto,
                                                                     @RequestHeader(name = "token", required = true) String token)
             throws Exception {
         UpdatePasswordResponseDto updatePasswordResponseDto = userService.updatePassword(updatePasswordRequestDto, token);

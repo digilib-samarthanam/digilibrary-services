@@ -8,6 +8,7 @@ import lombok.Getter;
 public class GenericErrorResponseDto {
 
     private final long timestamp = System.currentTimeMillis();
-    private final String errorCode;
     private final String errorMessage;
+    private final String errorCode;
+
 }
