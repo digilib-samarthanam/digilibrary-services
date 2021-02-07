@@ -19,6 +19,7 @@ import com.samarthanam.digitallibrary.util.UserUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,21 +38,19 @@ public class UserService {
     private final TokenService tokenService;
     private final EmailSenderService emailSenderService;
     private final String salt;
-    private final String hostName;
 
     public UserService(final UserRepository userRepository,
                        final TokenService tokenService,
                        final EmailSenderService emailSenderService,
-                       @Value("${password.salt}") final String salt,
-                       @Value("${host.name}") String hostName) {
+                       @Value("${password.salt}") final String salt) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.emailSenderService = emailSenderService;
         this.salt = salt;
-        this.hostName = hostName;
+//        this.hostName = hostName;
     }
 
-    public UserSignupResponseDto signUp(UserSignupRequestDto userSignupRequestDto) throws ConflictException, TokenCreationException, IOException {
+    public UserSignupResponseDto signUp(@Valid UserSignupRequestDto userSignupRequestDto, String origin) throws ConflictException, TokenCreationException, IOException {
 
         User user = findByEmailAddress(userSignupRequestDto.getEmailAddress().toLowerCase());
         if (user != null && user.isEmailVerified()) {
@@ -65,14 +64,14 @@ public class UserService {
         }
         EmailVerificationToken emailVerificationToken = new EmailVerificationToken(user.getUserSeqId());
         String token = tokenService.createJwtToken(emailVerificationToken);
-        Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.SIGNUP_VERIFY);
+        Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.SIGNUP_VERIFY, origin);
         EmailSenderDto emailSenderDto = new EmailSenderDto(user.getEmailAddress(), EmailTemplate.SIGNUP_VERIFY, templateData);
         emailSenderService.sendEmailToUser(emailSenderDto);
         return new UserSignupResponseDto("Email has been sent to your registered email id");
 
     }
 
-    public VerifySignUpResponseDto verifySignUp(VerifySignUpDto verifySignUpDto) throws TokenTemperedException, TokenExpiredException, UnauthorizedException {
+    public VerifySignUpResponseDto verifySignUp(@Valid VerifySignUpDto verifySignUpDto) throws TokenTemperedException, TokenExpiredException, UnauthorizedException {
         EmailVerificationToken emailVerificationToken = (EmailVerificationToken) tokenService.decodeJwtToken(verifySignUpDto.getToken(),
                 EmailVerificationToken.class);
         Optional<User> optionalUser = userRepository.findById(emailVerificationToken.getUserSequenceId());
@@ -85,7 +84,7 @@ public class UserService {
         return new VerifySignUpResponseDto(ServiceConstants.VERIFICATION_STATUS_SUCCESS);
     }
 
-    public UserLoginResponseDto login(UserLoginRequestDto userLoginRequestDto) throws TokenCreationException, UnauthorizedException {
+    public UserLoginResponseDto login(@Valid UserLoginRequestDto userLoginRequestDto) throws TokenCreationException, UnauthorizedException {
         String encryptedPassword = UserUtil.encryptPassword(userLoginRequestDto.getPassword(), salt);
         User dbUser = userRepository.findByEmailAddress(userLoginRequestDto.getEmail().toLowerCase());
         if (dbUser != null && encryptedPassword.equals(dbUser.getUserPassword())) {
@@ -102,12 +101,12 @@ public class UserService {
         }
     }
 
-    public ForgotPasswordResponseDto forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto) throws TokenCreationException, UserNotFoundException {
+    public ForgotPasswordResponseDto forgotPassword(@Valid ForgotPasswordRequestDto forgotPasswordRequestDto, String origin) throws TokenCreationException, UserNotFoundException {
         User dbUser = userRepository.findByEmailAddress(forgotPasswordRequestDto.getEmail().toLowerCase());
         if (dbUser != null && dbUser.isEmailVerified()) {
             ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken(forgotPasswordRequestDto.getEmail().toLowerCase());
             String token = tokenService.createJwtToken(forgotPasswordToken);
-            Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD);
+            Map<String, String> templateData = getEmailTemplateData(token, EmailTemplate.FORGOT_PASSWORD, origin);
             EmailSenderDto emailSenderDto = new EmailSenderDto(forgotPasswordRequestDto.getEmail().toLowerCase(), EmailTemplate.FORGOT_PASSWORD, templateData);
             emailSenderService.sendEmailToUser(emailSenderDto);
             return new ForgotPasswordResponseDto("Password reset email has been sent to your registered email id");
@@ -117,7 +116,7 @@ public class UserService {
         }
     }
 
-    public UpdatePasswordResponseDto updatePassword(UpdatePasswordRequestDto updatePasswordRequestDto, String token)
+    public UpdatePasswordResponseDto updatePassword(@Valid UpdatePasswordRequestDto updatePasswordRequestDto, String token)
             throws Exception {
         //validate token
         ForgotPasswordToken forgotPasswordToken = (ForgotPasswordToken) tokenService.decodeJwtToken(token, ForgotPasswordToken.class);
@@ -166,14 +165,14 @@ public class UserService {
                 .build();
     }
 
-    private Map<String, String> getEmailTemplateData(String token, EmailTemplate emailTemplate) {
+    private Map<String, String> getEmailTemplateData(String token, EmailTemplate emailTemplate, String origin) {
         Map<String, String> templateData = new HashMap<>();
         if (emailTemplate.equals(EmailTemplate.SIGNUP_VERIFY)) {
-            final String verifySignupLink = String.format("%s%s?token=%s", hostName, SIGNUP_VERIFY_UI_LINK, token);
+            final String verifySignupLink = String.format("%s%s?token=%s", origin, SIGNUP_VERIFY_UI_LINK, token);
             templateData.put(SIGNUP_VERIFY_LINK, verifySignupLink);
             return templateData;
         } else if (emailTemplate.equals(EmailTemplate.FORGOT_PASSWORD)) {
-            final String forgotPasswordLink = String.format("%s%s?token=%s", hostName, RESET_PASSWORD_LINK, token);
+            final String forgotPasswordLink = String.format("%s%s?token=%s", origin, RESET_PASSWORD_LINK, token);
             templateData.put(FORGOT_PASSWORD_LINK, forgotPasswordLink);
             return templateData;
         }

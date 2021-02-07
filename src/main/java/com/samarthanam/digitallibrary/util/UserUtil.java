@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.util.Base64;
-import java.util.UUID;
 
 import lombok.experimental.UtilityClass;
 
