@@ -14,7 +14,7 @@ repositories {
 ext {
 	lombokVersion = '1.18.18'
 	mapstructVersion = '1.4.2.Final'
-	awsSDKVersion = '1.11.942'
+	awsSDKVersion = '1.11.951'
 }
 
 dependencies {

@@ -49,7 +49,7 @@ public class BooksController {
         return usersBookService.usersRecentlyViewedBooks(userId, page, perPage);
     }
 
-    @GetMapping("/books")
+    @GetMapping("/home_page_books")
     public HomePageResponse getHomePageContent(
             @RequestParam(name = "user_id", required = false) Integer userId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
