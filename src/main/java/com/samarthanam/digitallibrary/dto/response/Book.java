@@ -10,7 +10,6 @@ public class Book {
     private String author;
     private Integer isbn;
     private String category;
-    private Integer bookStatusId;
     private String bookType;
     private String title;
     private String year;
@@ -18,5 +17,6 @@ public class Book {
     private String editionVersion;
     private LocalDateTime updatedTimestamp;
     private LocalDateTime createdTimestamp;
+    private Integer totalPages;
 
 }

@@ -51,4 +51,10 @@ public class Book {
     @Column(name = "create_ts")
     private LocalDateTime createdTimestamp;
 
+    @Column(name = "total_pages")
+    private Integer totalPages;
+
+    @Column(name = "file_name")
+    private String fileName;
+
 }

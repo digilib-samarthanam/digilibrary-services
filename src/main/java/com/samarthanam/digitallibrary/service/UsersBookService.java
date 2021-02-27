@@ -27,13 +27,10 @@ public class UsersBookService {
     @Autowired
     private UserActivityHistoryRepository userActivityHistoryRepository;
 
-    public List<Book> usersBookmarkedBooks(Integer userId, int page, int perPage) {
+    public List<BookActivityStatus> usersBookmarkedBooks(Integer userId, int page, int perPage) {
         log.info(String.format("Querying bookmarked books for user_id = %d from database", userId));
         var userBookmarks = userBookmarksRepository.findByUserIdOrderByCreatedTimestampDesc(userId, PageRequest.of(page, perPage));
-        return userBookmarks.stream()
-                .map(UserBookmarks::getBook)
-                .map(booksMapper::mapToBook)
-                .collect(Collectors.toUnmodifiableList());
+        return booksMapper.mapUserBookmarksToBookActivityStatuses(userBookmarks);
     }
 
     public List<BookActivityStatus> usersRecentlyViewedBooks(Integer userId, int page, int perPage) {

@@ -3,6 +3,7 @@ package com.samarthanam.digitallibrary.service.mapper;
 import com.samarthanam.digitallibrary.dto.response.Book;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
+import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -20,6 +21,8 @@ public interface BooksMapper {
     List<Book> mapToBooks(List<com.samarthanam.digitallibrary.entity.Book> books);
 
     BookActivityStatus mapToBookActivityStatus(UserActivityHistory userActivityHistory);
+    BookActivityStatus mapToBookActivityStatus(UserBookmarks userBookmarks);
     List<BookActivityStatus> mapToBookActivityStatuses(List<UserActivityHistory> books);
+    List<BookActivityStatus> mapUserBookmarksToBookActivityStatuses(List<UserBookmarks> books);
 
 }
