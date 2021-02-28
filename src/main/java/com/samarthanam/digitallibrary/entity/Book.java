@@ -57,4 +57,11 @@ public class Book {
     @Column(name = "file_name")
     private String fileName;
 
+    public String getFileName() {
+        return fileName + ".pdf" ;// ".mp3"
+    }
+
+    public String getThumbnailFileName() {
+        return fileName + ".jpg";
+    }
 }

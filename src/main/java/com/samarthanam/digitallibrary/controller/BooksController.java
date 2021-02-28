@@ -32,7 +32,7 @@ public class BooksController {
     }
 
     @GetMapping("/users/{user_id}/bookmarked_books")
-    public List<Book> usersBookmarkedBooks(
+    public List<BookActivityStatus> usersBookmarkedBooks(
             @PathVariable("user_id") Integer userId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {

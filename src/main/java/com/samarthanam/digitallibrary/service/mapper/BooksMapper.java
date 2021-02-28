@@ -16,13 +16,14 @@ public interface BooksMapper {
     @Mapping(target = "author", source = "author.firstName")
     @Mapping(target = "category", source = "category.categoryName")
     @Mapping(target = "bookType", source = "bookType.bookTypeDescription")
-    Book mapToBook(com.samarthanam.digitallibrary.entity.Book book);
+    @Mapping(target = "thumbnailUrl", ignore = true)
+    Book map(com.samarthanam.digitallibrary.entity.Book book);
 
     List<Book> mapToBooks(List<com.samarthanam.digitallibrary.entity.Book> books);
 
-    BookActivityStatus mapToBookActivityStatus(UserActivityHistory userActivityHistory);
-    BookActivityStatus mapToBookActivityStatus(UserBookmarks userBookmarks);
-    List<BookActivityStatus> mapToBookActivityStatuses(List<UserActivityHistory> books);
+    BookActivityStatus map(UserActivityHistory userActivityHistory);
+    BookActivityStatus map(UserBookmarks userBookmarks);
+    List<BookActivityStatus> mapUserActivityHistoryToBookActivityStatuses(List<UserActivityHistory> books);
     List<BookActivityStatus> mapUserBookmarksToBookActivityStatuses(List<UserBookmarks> books);
 
 }

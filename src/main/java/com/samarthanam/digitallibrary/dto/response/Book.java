@@ -18,5 +18,6 @@ public class Book {
     private LocalDateTime updatedTimestamp;
     private LocalDateTime createdTimestamp;
     private Integer totalPages;
+    private String thumbnailUrl;
 
 }

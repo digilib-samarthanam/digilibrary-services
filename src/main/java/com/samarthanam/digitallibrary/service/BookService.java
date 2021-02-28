@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,10 +21,20 @@ public class BookService {
     @Autowired
     private BooksRepository booksRepository;
 
+    @Autowired
+    private AWSCloudService awsCloudService;
+
     public List<Book> recentlyAddedBooks(int page, int perPage) {
         log.info("Querying recently added books from database");
         var books = booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
-        return booksMapper.mapToBooks(books);
+        return books.stream()
+                .map(bookEntity -> {
+                    Book book = booksMapper.map(bookEntity);
+                    book.setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                            bookEntity.getThumbnailFileName()));
+                    return book;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
 }
