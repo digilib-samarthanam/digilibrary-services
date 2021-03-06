@@ -1,5 +1,6 @@
 package com.samarthanam.digitallibrary.repository;
 
+import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.entity.Book;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -11,7 +12,10 @@ import java.util.List;
 @Repository
 public interface BooksRepository extends JpaRepository<Book, Integer> {
 
-    @EntityGraph(attributePaths = { "author", "category", "bookType" })
-    List<Book> findAllByOrderByCreatedTimestampDesc(Pageable pageRequest);
+    @EntityGraph(attributePaths = {"author", "category", "bookTypeFormat"})
+    List<Book> findByOrderByCreatedTimestampDesc(Pageable pageRequest);
+
+    @EntityGraph(attributePaths = {"author", "category", "bookTypeFormat"})
+    List<Book> findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(BookType bookType, Pageable pageRequest);
 
 }

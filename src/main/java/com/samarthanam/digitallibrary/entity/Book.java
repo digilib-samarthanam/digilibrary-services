@@ -31,7 +31,7 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_type_code")
-    private BookType bookType;
+    private BookTypeFormat bookTypeFormat;
 
     @Column(name = "title")
     private String title;

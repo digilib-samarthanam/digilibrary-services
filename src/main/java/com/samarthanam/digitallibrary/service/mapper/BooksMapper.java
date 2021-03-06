@@ -8,22 +8,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
 
-import java.util.List;
-
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface BooksMapper {
 
-    @Mapping(target = "author", source = "author.firstName")
+    @Mapping(target = "author", expression = "java(book.getAuthor().getFirstName() + \" \" + book.getAuthor().getLastName())")
     @Mapping(target = "category", source = "category.categoryName")
-    @Mapping(target = "bookType", source = "bookType.bookTypeDescription")
+    @Mapping(target = "bookType", source = "bookTypeFormat.bookTypeDescription")
     @Mapping(target = "thumbnailUrl", ignore = true)
     Book map(com.samarthanam.digitallibrary.entity.Book book);
 
-    List<Book> mapToBooks(List<com.samarthanam.digitallibrary.entity.Book> books);
-
     BookActivityStatus map(UserActivityHistory userActivityHistory);
+
     BookActivityStatus map(UserBookmarks userBookmarks);
-    List<BookActivityStatus> mapUserActivityHistoryToBookActivityStatuses(List<UserActivityHistory> books);
-    List<BookActivityStatus> mapUserBookmarksToBookActivityStatuses(List<UserBookmarks> books);
 
 }
