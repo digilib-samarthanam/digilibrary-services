@@ -1,5 +1,6 @@
 package com.samarthanam.digitallibrary.service;
 
+import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.response.Book;
 import com.samarthanam.digitallibrary.repository.BooksRepository;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
@@ -24,9 +25,12 @@ public class BookService {
     @Autowired
     private AWSCloudService awsCloudService;
 
-    public List<Book> recentlyAddedBooks(int page, int perPage) {
+    public List<Book> recentlyAddedBooks(int page, int perPage, BookType bookType) {
+
         log.info("Querying recently added books from database");
-        var books = booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
+        var books = bookType == null ? booksRepository.findByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
+                : booksRepository.findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
+
         return books.stream()
                 .map(bookEntity -> {
                     Book book = booksMapper.map(bookEntity);
