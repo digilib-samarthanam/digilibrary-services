@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "book")
@@ -54,11 +55,14 @@ public class Book {
     @Column(name = "total_pages")
     private Integer totalPages;
 
+    @Column(name = "total_audio_time")
+    private LocalTime totalAudioTime;
+
     @Column(name = "file_name")
     private String fileName;
 
     public String getFileName() {
-        return fileName + ".pdf" ;// ".mp3"
+        return bookTypeFormat.getBookTypeDescription().fileNameWithExtension(fileName);
     }
 
     public String getThumbnailFileName() {

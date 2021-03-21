@@ -55,14 +55,12 @@ public class TokenService {
 
     public String createJwtToken(AbstractToken token) throws TokenCreationException {
         try {
-            JWTCreator.Builder builder = com.auth0.jwt.JWT.create();
-            builder.withIssuer(issuer);
-            builder.withExpiresAt(new Date(System.currentTimeMillis() + jwtExpTTLMilli));
-            builder.withJWTId(String.valueOf(UUID.randomUUID()));
-
-            builder.withClaim(PAYLOAD_KEY, serializePayload(token));
-            Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
-            return builder.sign(algorithm);
+            return JWT.create()
+                    .withIssuer(issuer)
+                    .withExpiresAt(new Date(System.currentTimeMillis() + jwtExpTTLMilli))
+                    .withJWTId(String.valueOf(UUID.randomUUID()))
+                    .withClaim(PAYLOAD_KEY, serializePayload(token))
+                    .sign(algorithm);
 
         } catch (JWTCreationException exception) {
             //Invalid Signing configuration / Couldn't convert Claims.

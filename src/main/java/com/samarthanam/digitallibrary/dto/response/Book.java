@@ -3,6 +3,7 @@ package com.samarthanam.digitallibrary.dto.response;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 public class Book {
@@ -18,6 +19,8 @@ public class Book {
     private LocalDateTime updatedTimestamp;
     private LocalDateTime createdTimestamp;
     private Integer totalPages;
+    private LocalTime totalAudioTime;
+    private String fileName;
     private String thumbnailUrl;
 
 }
