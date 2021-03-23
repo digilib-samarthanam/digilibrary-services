@@ -1,7 +1,9 @@
 package com.samarthanam.digitallibrary.service;
 
+import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
+import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import com.samarthanam.digitallibrary.repository.UserActivityHistoryRepository;
 import com.samarthanam.digitallibrary.repository.UserBookmarksRepository;
@@ -27,19 +29,41 @@ public class UsersBookService {
     @Autowired
     private UserActivityHistoryRepository userActivityHistoryRepository;
 
-    public List<BookResponse> usersBookmarkedBooks(Integer userId, int page, int perPage) {
+    @Autowired
+    private AWSCloudService awsCloudService;
+
+    public List<BookActivityStatus> usersBookmarkedBooks(Integer userId, int page, int perPage, BookType bookType) {
+
         log.info(String.format("Querying bookmarked books for user_id = %d from database", userId));
-        var userBookmarks = userBookmarksRepository.findByUserIdOrderByCreatedTimestampDesc(userId, PageRequest.of(page, perPage));
+        var userBookmarks = bookType == null ? userBookmarksRepository.findByUserIdOrderByCreatedTimestampDesc(
+                userId, PageRequest.of(page, perPage)) : userBookmarksRepository.findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(
+                userId, bookType, PageRequest.of(page, perPage));
+
         return userBookmarks.stream()
-                .map(UserBookmarks::getBook)
-                .map(booksMapper::mapToBook)
+                .map((UserBookmarks userBookmark) -> {
+                    BookActivityStatus bookActivityStatus = booksMapper.map(userBookmark);
+                    bookActivityStatus.getBookResponse().setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                            userBookmark.getBook().getThumbnailFileName()));
+                    return bookActivityStatus;
+                })
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<BookActivityStatus> usersRecentlyViewedBooks(Integer userId, int page, int perPage) {
+    public List<BookActivityStatus> usersRecentlyViewedBooks(Integer userId, int page, int perPage, BookType bookType) {
+
         log.info(String.format("Querying recently viewed books for user_id = %d from database", userId));
-        var userActivityHistory = userActivityHistoryRepository.findByUserIdOrderByUpdatedTimestamp(userId, PageRequest.of(page, perPage));
-        return booksMapper.mapToBookActivityStatuses(userActivityHistory);
+        var userActivityHistory = bookType == null ? userActivityHistoryRepository.findByUserIdOrderByUpdatedTimestamp(
+                userId, PageRequest.of(page, perPage)) : userActivityHistoryRepository.findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByUpdatedTimestamp(
+                userId, bookType, PageRequest.of(page, perPage));
+
+        return userActivityHistory.stream()
+                .map((UserActivityHistory userActivityHistoryItem) -> {
+                    BookActivityStatus bookActivityStatus = booksMapper.map(userActivityHistoryItem);
+                    bookActivityStatus.getBookResponse().setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                            userActivityHistoryItem.getBook().getThumbnailFileName()));
+                    return bookActivityStatus;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
 }

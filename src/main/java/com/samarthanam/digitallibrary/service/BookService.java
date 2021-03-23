@@ -1,9 +1,13 @@
 package com.samarthanam.digitallibrary.service;
 
+
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.entity.Author;
 import com.samarthanam.digitallibrary.entity.Book;
+import com.samarthanam.digitallibrary.constant.BookType;
+import com.samarthanam.digitallibrary.dto.response.BookResponse;
+
 import com.samarthanam.digitallibrary.repository.BooksRepository;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,24 +24,38 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class BookService {
-
     private static final BooksMapper booksMapper = Mappers.getMapper(BooksMapper.class);
+
+    @Autowired
+    private BooksRepository booksRepository;
 
     @Autowired
     private EntityManager entityManager;
 
     @Autowired
-    private BooksRepository booksRepository;
+    private AWSCloudService awsCloudService;
 
-    public List<BookResponse> recentlyAddedBooks(int page, int perPage) {
+    public List<BookResponse> recentlyAddedBooks(int page, int perPage, BookType bookType) {
+
         log.info("Querying recently added books from database");
-        var books = booksRepository.findAllByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage));
-        return booksMapper.mapToBooks(books);
+        var books = bookType == null ? booksRepository.findByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
+                : booksRepository.findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
+
+        return books.stream()
+                .map(bookEntity -> {
+                    BookResponse book = booksMapper.map(bookEntity);
+                    book.setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                            bookEntity.getThumbnailFileName()));
+                    return book;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
+
 
     public List<BookResponse> searchBooks(SearchBooksCriteria searchBooksCriteria , int page, int perPage) {
         log.info("Querying book details from database");

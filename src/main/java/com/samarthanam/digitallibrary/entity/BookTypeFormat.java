@@ -1,13 +1,11 @@
 package com.samarthanam.digitallibrary.entity;
 
+import com.samarthanam.digitallibrary.constant.BookType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,14 +13,15 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookType {
+public class BookTypeFormat {
 
     @Id
     @Column(name = "book_type_code")
     private Integer bookTypeCode;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "book_type_description")
-    private String bookTypeDescription;
+    private BookType bookTypeDescription;
 
     @Column(name = "update_ts")
     private LocalDateTime updatedTimestamp;

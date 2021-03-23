@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "book")
@@ -31,7 +32,7 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_type_code")
-    private BookType bookType;
+    private BookTypeFormat bookTypeFormat;
 
     @Column(name = "title")
     private String title;
@@ -51,4 +52,20 @@ public class Book {
     @Column(name = "create_ts")
     private LocalDateTime createdTimestamp;
 
+    @Column(name = "total_pages")
+    private Integer totalPages;
+
+    @Column(name = "total_audio_time")
+    private LocalTime totalAudioTime;
+
+    @Column(name = "file_name")
+    private String fileName;
+
+    public String getFileName() {
+        return bookTypeFormat.getBookTypeDescription().fileNameWithExtension(fileName);
+    }
+
+    public String getThumbnailFileName() {
+        return fileName + ".jpg";
+    }
 }

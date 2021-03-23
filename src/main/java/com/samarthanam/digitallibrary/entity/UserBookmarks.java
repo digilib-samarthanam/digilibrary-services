@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "user_bookmarks")
@@ -23,5 +24,11 @@ public class UserBookmarks {
 
     @Column(name = "crte_ts")
     private LocalDateTime createdTimestamp;
+
+    @Column(name = "current_page")
+    private Integer currentPage;
+
+    @Column(name = "audio_time")
+    private LocalTime audioTime;
 
 }
