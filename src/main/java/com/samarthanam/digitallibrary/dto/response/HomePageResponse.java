@@ -13,7 +13,7 @@ import java.util.List;
 public class HomePageResponse {
 
     List<BookActivityStatus> recentlyViewedBooks;
-    List<Book> bookmarkedBooks;
-    List<Book> recentlyAddedBooks;
+    List<BookResponse> bookmarkedBookResponses;
+    List<BookResponse> recentlyAddedBookResponses;
 
 }

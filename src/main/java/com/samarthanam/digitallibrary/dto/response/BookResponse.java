@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class Book {
+public class BookResponse {
 
     private String author;
     private Integer isbn;

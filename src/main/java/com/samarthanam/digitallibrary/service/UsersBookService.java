@@ -1,6 +1,6 @@
 package com.samarthanam.digitallibrary.service;
 
-import com.samarthanam.digitallibrary.dto.response.Book;
+import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import com.samarthanam.digitallibrary.repository.UserActivityHistoryRepository;
@@ -27,7 +27,7 @@ public class UsersBookService {
     @Autowired
     private UserActivityHistoryRepository userActivityHistoryRepository;
 
-    public List<Book> usersBookmarkedBooks(Integer userId, int page, int perPage) {
+    public List<BookResponse> usersBookmarkedBooks(Integer userId, int page, int perPage) {
         log.info(String.format("Querying bookmarked books for user_id = %d from database", userId));
         var userBookmarks = userBookmarksRepository.findByUserIdOrderByCreatedTimestampDesc(userId, PageRequest.of(page, perPage));
         return userBookmarks.stream()
