@@ -1,7 +1,12 @@
 package com.samarthanam.digitallibrary.controller;
 
+
+import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
+import com.samarthanam.digitallibrary.dto.response.BookResponse;
+
 import com.samarthanam.digitallibrary.constant.BookType;
-import com.samarthanam.digitallibrary.dto.response.Book;
+
+
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.HomePageResponse;
 import com.samarthanam.digitallibrary.service.BookService;
@@ -25,7 +30,7 @@ public class BooksController {
 
 
     @GetMapping("/recently_added_books")
-    public List<Book> recentlyAddedBooks(
+    public List<BookResponse> recentlyAddedBooks(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage,
             @RequestParam(name = "book_type", required = false) BookType bookType) {
@@ -65,6 +70,20 @@ public class BooksController {
                 .bookmarkedBooks(userId == null ? null : usersBookService.usersBookmarkedBooks(userId, page, perPage, bookType))
                 .recentlyAddedBooks(bookService.recentlyAddedBooks(page, perPage, bookType))
                 .build();
+    }
+    @GetMapping("/search")
+    public List<BookResponse> searchBooks(
+            @RequestParam(name = "any_book", required = false) String anyBook,
+            @RequestParam(name = "book_name", required = false) String bookName,
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "author", required = false) String author,
+            @RequestParam(name = "bookType", required = false) String bookType,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
+
+
+        SearchBooksCriteria searchBooksCriteria = new SearchBooksCriteria(anyBook, bookName , category ,author , bookType ) ;
+        return bookService.searchBooks(searchBooksCriteria, page, perPage);
     }
 
 }

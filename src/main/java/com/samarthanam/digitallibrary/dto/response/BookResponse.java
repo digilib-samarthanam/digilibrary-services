@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
-public class Book {
+public class BookResponse {
 
     private String author;
     private Integer isbn;

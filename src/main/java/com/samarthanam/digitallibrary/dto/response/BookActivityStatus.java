@@ -8,7 +8,7 @@ import java.time.LocalTime;
 @Data
 public class BookActivityStatus {
 
-    private Book book;
+    private BookResponse bookResponse;
     private Integer currentPage;
     private Boolean activeStatus;
     private LocalTime audioTime;

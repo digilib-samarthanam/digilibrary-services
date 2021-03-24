@@ -14,6 +14,6 @@ public class HomePageResponse {
 
     List<BookActivityStatus> recentlyViewedBooks;
     List<BookActivityStatus> bookmarkedBooks;
-    List<Book> recentlyAddedBooks;
+    List<BookResponse> recentlyAddedBooks;
 
 }

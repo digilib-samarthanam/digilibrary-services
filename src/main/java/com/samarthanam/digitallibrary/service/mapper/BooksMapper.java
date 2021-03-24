@@ -1,12 +1,14 @@
 package com.samarthanam.digitallibrary.service.mapper;
 
-import com.samarthanam.digitallibrary.dto.response.Book;
+import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
+
+import java.util.List;
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface BooksMapper {
@@ -15,8 +17,8 @@ public interface BooksMapper {
     @Mapping(target = "category", source = "category.categoryName")
     @Mapping(target = "bookType", source = "bookTypeFormat.bookTypeDescription")
     @Mapping(target = "thumbnailUrl", ignore = true)
-    Book map(com.samarthanam.digitallibrary.entity.Book book);
-
+    BookResponse map(com.samarthanam.digitallibrary.entity.Book book);
+    List<BookResponse> mapToBooks(List<com.samarthanam.digitallibrary.entity.Book> books);
     BookActivityStatus map(UserActivityHistory userActivityHistory);
 
     BookActivityStatus map(UserBookmarks userBookmarks);
