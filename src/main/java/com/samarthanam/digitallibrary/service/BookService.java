@@ -70,7 +70,7 @@ public class BookService {
             Predicate predicateForAuthor
                     = criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAnyBook() + "%"  );
             Predicate predicateForDescription
-                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookType").get("bookTypeDescription")), "%"  + searchBooksCriteria.getAnyBook() + "%"  );
+                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%"  + searchBooksCriteria.getAnyBook() + "%"  );
             Predicate finalPredicate
                     = criteriaBuilder.or(predicateForAuthor,predicateForTitle,predicateForDescription);
             criteriaQuery.select(classData).where(finalPredicate);
@@ -96,7 +96,7 @@ public class BookService {
                 predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("title")), "%"  + searchBooksCriteria.getBookName().toLowerCase() + "%"  ));
             }
             if(searchBooksCriteria.getBookType() != null && ! searchBooksCriteria.getBookType().equalsIgnoreCase("")) {
-                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookType").get("bookTypeDescription")), "%" + searchBooksCriteria.getBookType().toLowerCase() + "%"  ));
+                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%" + searchBooksCriteria.getBookType().toLowerCase() + "%"  ));
             }
             if(searchBooksCriteria.getCategory() != null && ! searchBooksCriteria.getCategory().equalsIgnoreCase("")) {
                 predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("category").get("categoryName")), "%" + searchBooksCriteria.getCategory().toLowerCase() + "%" ));
