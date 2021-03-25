@@ -68,9 +68,9 @@ public class BookService {
             Predicate predicateForTitle
                     = criteriaBuilder.like(criteriaBuilder.lower(classData.get("title")), "%" +searchBooksCriteria.getAnyBook().toLowerCase()+ "%"  );
             Predicate predicateForAuthor
-                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAnyBook() + "%"  );
+                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAnyBook().toLowerCase() + "%"  );
             Predicate predicateForDescription
-                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%"  + searchBooksCriteria.getAnyBook() + "%"  );
+                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%"  + searchBooksCriteria.getAnyBook().toLowerCase() + "%"  );
             Predicate finalPredicate
                     = criteriaBuilder.or(predicateForAuthor,predicateForTitle,predicateForDescription);
             criteriaQuery.select(classData).where(finalPredicate);
@@ -78,11 +78,22 @@ public class BookService {
             List<Predicate> predicates = buildPredicates(searchBooksCriteria, criteriaBuilder, classData);
             criteriaQuery.select(classData).where(criteriaBuilder.and(predicates.toArray(new Predicate[]{})));
         }
-        List<Book> books  = entityManager.createQuery(criteriaQuery)
+        var books  = entityManager.createQuery(criteriaQuery)
                 .setFirstResult(page * perPage)
                 .setMaxResults(perPage)
+
                 .getResultList();
-        return booksMapper.mapToBooks(books) ;
+
+        return books.stream()
+                .map(bookEntity -> {
+                    BookResponse book = booksMapper.map(bookEntity);
+                    book.setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                            bookEntity.getThumbnailFileName()));
+                    return book;
+                })
+                .collect(Collectors.toUnmodifiableList());
+
+      //  return booksMapper.mapToBooks(books) ;
     }
 
     public List<Predicate> buildPredicates (SearchBooksCriteria searchBooksCriteria ,CriteriaBuilder criteriaBuilder ,Root<Book> classData){
