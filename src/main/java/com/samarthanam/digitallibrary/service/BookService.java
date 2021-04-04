@@ -1,13 +1,10 @@
 package com.samarthanam.digitallibrary.service;
 
 
+import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
-import com.samarthanam.digitallibrary.entity.Author;
 import com.samarthanam.digitallibrary.entity.Book;
-import com.samarthanam.digitallibrary.constant.BookType;
-import com.samarthanam.digitallibrary.dto.response.BookResponse;
-
 import com.samarthanam.digitallibrary.repository.BooksRepository;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -58,6 +54,7 @@ public class BookService {
 
 
     public List<BookResponse> searchBooks(SearchBooksCriteria searchBooksCriteria , int page, int perPage) {
+
         log.info("Querying book details from database");
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Book> criteriaQuery = criteriaBuilder.createQuery(Book.class);
@@ -81,7 +78,6 @@ public class BookService {
         var books  = entityManager.createQuery(criteriaQuery)
                 .setFirstResult(page * perPage)
                 .setMaxResults(perPage)
-
                 .getResultList();
 
         return books.stream()
@@ -92,26 +88,24 @@ public class BookService {
                     return book;
                 })
                 .collect(Collectors.toUnmodifiableList());
-
-      //  return booksMapper.mapToBooks(books) ;
     }
 
     public List<Predicate> buildPredicates (SearchBooksCriteria searchBooksCriteria ,CriteriaBuilder criteriaBuilder ,Root<Book> classData){
-            List<Predicate> predicateList = new ArrayList<Predicate>();
 
+        List<Predicate> predicateList = new ArrayList<>();
 
-            if(searchBooksCriteria.getAuthor() != null && ! searchBooksCriteria.getAuthor().equalsIgnoreCase("")) {
-                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAuthor().toLowerCase() + "%"  ));
-            }
-            if(searchBooksCriteria.getBookName() != null && ! searchBooksCriteria.getBookName().equalsIgnoreCase("")) {
-                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("title")), "%"  + searchBooksCriteria.getBookName().toLowerCase() + "%"  ));
-            }
-            if(searchBooksCriteria.getBookType() != null && ! searchBooksCriteria.getBookType().equalsIgnoreCase("")) {
-                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%" + searchBooksCriteria.getBookType().toLowerCase() + "%"  ));
-            }
-            if(searchBooksCriteria.getCategory() != null && ! searchBooksCriteria.getCategory().equalsIgnoreCase("")) {
-                predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("category").get("categoryName")), "%" + searchBooksCriteria.getCategory().toLowerCase() + "%" ));
-            }
+        if(searchBooksCriteria.getAuthor() != null && ! searchBooksCriteria.getAuthor().equalsIgnoreCase("")) {
+            predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAuthor().toLowerCase() + "%"  ));
+        }
+        if(searchBooksCriteria.getBookName() != null && ! searchBooksCriteria.getBookName().equalsIgnoreCase("")) {
+            predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("title")), "%"  + searchBooksCriteria.getBookName().toLowerCase() + "%"  ));
+        }
+        if(searchBooksCriteria.getBookType() != null && ! searchBooksCriteria.getBookType().equalsIgnoreCase("")) {
+            predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%" + searchBooksCriteria.getBookType().toLowerCase() + "%"  ));
+        }
+        if(searchBooksCriteria.getCategory() != null && ! searchBooksCriteria.getCategory().equalsIgnoreCase("")) {
+            predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("category").get("categoryName")), "%" + searchBooksCriteria.getCategory().toLowerCase() + "%" ));
+        }
 
         return predicateList;
     }
