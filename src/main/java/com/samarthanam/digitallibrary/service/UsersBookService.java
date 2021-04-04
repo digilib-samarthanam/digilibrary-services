@@ -1,7 +1,6 @@
 package com.samarthanam.digitallibrary.service;
 
 import com.samarthanam.digitallibrary.constant.BookType;
-import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
@@ -42,7 +41,7 @@ public class UsersBookService {
         return userBookmarks.stream()
                 .map((UserBookmarks userBookmark) -> {
                     BookActivityStatus bookActivityStatus = booksMapper.map(userBookmark);
-                    bookActivityStatus.getBookResponse().setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                    bookActivityStatus.getBook().setThumbnailUrl(awsCloudService.generatePresignedUrl(
                             userBookmark.getBook().getThumbnailFileName()));
                     return bookActivityStatus;
                 })
@@ -59,7 +58,7 @@ public class UsersBookService {
         return userActivityHistory.stream()
                 .map((UserActivityHistory userActivityHistoryItem) -> {
                     BookActivityStatus bookActivityStatus = booksMapper.map(userActivityHistoryItem);
-                    bookActivityStatus.getBookResponse().setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                    bookActivityStatus.getBook().setThumbnailUrl(awsCloudService.generatePresignedUrl(
                             userActivityHistoryItem.getBook().getThumbnailFileName()));
                     return bookActivityStatus;
                 })

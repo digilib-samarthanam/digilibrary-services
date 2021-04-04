@@ -2,6 +2,7 @@ package com.samarthanam.digitallibrary.service.mapper;
 
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
+import com.samarthanam.digitallibrary.entity.Book;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import org.mapstruct.Mapper;
@@ -17,8 +18,8 @@ public interface BooksMapper {
     @Mapping(target = "category", source = "category.categoryName")
     @Mapping(target = "bookType", source = "bookTypeFormat.bookTypeDescription")
     @Mapping(target = "thumbnailUrl", ignore = true)
-    BookResponse map(com.samarthanam.digitallibrary.entity.Book book);
-    List<BookResponse> mapToBooks(List<com.samarthanam.digitallibrary.entity.Book> books);
+    BookResponse map(Book book);
+
     BookActivityStatus map(UserActivityHistory userActivityHistory);
 
     BookActivityStatus map(UserBookmarks userBookmarks);
