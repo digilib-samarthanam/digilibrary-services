@@ -64,12 +64,14 @@ public class BookService {
 
             Predicate predicateForTitle
                     = criteriaBuilder.like(criteriaBuilder.lower(classData.get("title")), "%" +searchBooksCriteria.getAnyBook().toLowerCase()+ "%"  );
-            Predicate predicateForAuthor
+            Predicate predicateForAuthorFirstName
                     = criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAnyBook().toLowerCase() + "%"  );
+            Predicate predicateForAuthorLastName
+                    = criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("lastName")), "%" + searchBooksCriteria.getAnyBook().toLowerCase() + "%"  );
             Predicate predicateForDescription
                     = criteriaBuilder.like(criteriaBuilder.lower(classData.get("bookTypeFormat").get("bookTypeDescription").as(String.class)), "%"  + searchBooksCriteria.getAnyBook().toLowerCase() + "%"  );
             Predicate finalPredicate
-                    = criteriaBuilder.or(predicateForAuthor,predicateForTitle,predicateForDescription);
+                    = criteriaBuilder.or(predicateForAuthorFirstName, predicateForAuthorLastName, predicateForTitle, predicateForDescription);
             criteriaQuery.select(classData).where(finalPredicate);
         }else {
             List<Predicate> predicates = buildPredicates(searchBooksCriteria, criteriaBuilder, classData);
