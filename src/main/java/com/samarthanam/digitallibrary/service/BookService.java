@@ -97,8 +97,13 @@ public class BookService {
         List<Predicate> predicateList = new ArrayList<>();
 
         if (searchBooksCriteria.getAuthor() != null && !searchBooksCriteria.getAuthor().equalsIgnoreCase("")) {
-            predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("firstName")), "%" + searchBooksCriteria.getAuthor().toLowerCase() + "%"));
-            predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("author").get("lastName")), "%" + searchBooksCriteria.getAuthor().toLowerCase() + "%"));
+            predicateList.add(criteriaBuilder.or(criteriaBuilder
+                                                         .like(criteriaBuilder.lower(classData.get("author").get("firstName")),
+                                                               "%" + searchBooksCriteria.getAuthor().toLowerCase() + "%"),
+                                                 criteriaBuilder
+                                                         .like(criteriaBuilder.lower(classData.get("author").get("lastName")),
+                                                               "%" + searchBooksCriteria.getAuthor().toLowerCase() + "%")
+            ));
         }
         if (searchBooksCriteria.getBookName() != null && !searchBooksCriteria.getBookName().equalsIgnoreCase("")) {
             predicateList.add(criteriaBuilder.like(criteriaBuilder.lower(classData.get("title")), "%" + searchBooksCriteria.getBookName().toLowerCase() + "%"));
