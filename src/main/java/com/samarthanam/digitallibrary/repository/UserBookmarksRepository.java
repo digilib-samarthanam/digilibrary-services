@@ -2,6 +2,7 @@ package com.samarthanam.digitallibrary.repository;
 
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +18,9 @@ public interface UserBookmarksRepository extends JpaRepository<UserBookmarks, In
 
     @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookTypeFormat" })
     List<UserBookmarks> findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(Integer userId, BookType bookType, Pageable pageRequest);
+
+//    @Override
+//    @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookTypeFormat" })
+//    <S extends UserBookmarks> boolean exists(Example<S> example);
 
 }
