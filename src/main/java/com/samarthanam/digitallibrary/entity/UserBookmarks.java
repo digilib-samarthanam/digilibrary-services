@@ -13,6 +13,8 @@ public class UserBookmarks {
 
     @Id
     @Column(name = "user_bookmarks_id")
+    @SequenceGenerator(name = "seq", sequenceName = "user_bookmarks_id_seq", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
     private Integer userBookmarksId;
 
     @Column(name = "user_id")

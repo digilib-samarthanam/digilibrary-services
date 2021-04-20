@@ -2,6 +2,7 @@ package com.samarthanam.digitallibrary.controller;
 
 
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
+import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
 
 import com.samarthanam.digitallibrary.constant.BookType;
@@ -13,6 +14,7 @@ import com.samarthanam.digitallibrary.service.BookService;
 import com.samarthanam.digitallibrary.service.UsersBookService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -84,6 +86,19 @@ public class BooksController {
 
         SearchBooksCriteria searchBooksCriteria = new SearchBooksCriteria(anyBook, bookName , category ,author , bookType ) ;
         return bookService.searchBooks(searchBooksCriteria, page, perPage);
+    }
+
+
+    @PostMapping("/bookmarked_books")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void bookmarkBook(
+//            @PathVariable("user_id") Integer userId,
+//            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+//            @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage,
+//            @RequestParam(name = "book_type", required = false) BookType bookType) {
+            @RequestBody BookActivityStatusRequest bookActivityStatusRequest) {
+
+        usersBookService.bookmarkBook(bookActivityStatusRequest);
     }
 
 }

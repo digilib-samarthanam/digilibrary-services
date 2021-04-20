@@ -2,6 +2,7 @@ package com.samarthanam.digitallibrary.service;
 
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
+import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import com.samarthanam.digitallibrary.repository.UserActivityHistoryRepository;
@@ -10,6 +11,7 @@ import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +65,20 @@ public class UsersBookService {
                     return bookActivityStatus;
                 })
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public void bookmarkBook(BookActivityStatusRequest bookActivityStatusRequest) {
+
+        log.info(String.format("Bookmarking the book isbn = %d for user id = %d",
+                               bookActivityStatusRequest.getIsbn(),
+                               bookActivityStatusRequest.getUserId()));
+
+        var tempUserBookmark = booksMapper.mapWithNoCurrentTimestamp(bookActivityStatusRequest);
+        if (userBookmarksRepository.exists(Example.of(tempUserBookmark)))
+            throw new RuntimeException("Duplicate bookmark request, requested entry already exists");
+
+        var userBookmark = booksMapper.mapWithCurrentTimestamp(bookActivityStatusRequest);
+        userBookmarksRepository.save(userBookmark);
     }
 
 }
