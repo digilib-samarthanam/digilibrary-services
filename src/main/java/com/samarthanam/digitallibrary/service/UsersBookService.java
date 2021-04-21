@@ -6,8 +6,10 @@ import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
 import com.samarthanam.digitallibrary.exception.DuplicateBookmarkRequestException;
+import com.samarthanam.digitallibrary.repository.BooksRepository;
 import com.samarthanam.digitallibrary.repository.UserActivityHistoryRepository;
 import com.samarthanam.digitallibrary.repository.UserBookmarksRepository;
+import com.samarthanam.digitallibrary.repository.UserRepository;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ValidationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,12 @@ public class UsersBookService {
 
     @Autowired
     private AWSCloudService awsCloudService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private BooksRepository booksRepository;
 
     public List<BookActivityStatus> usersBookmarkedBooks(Integer userId, int page, int perPage, BookType bookType) {
 
@@ -72,6 +81,11 @@ public class UsersBookService {
         log.info(String.format("Bookmarking the book isbn = %d for user id = %d",
                                bookActivityStatusRequest.getIsbn(),
                                bookActivityStatusRequest.getUserId()));
+        if (!userRepository.existsById(bookActivityStatusRequest.getUserId()))
+            throw new ValidationException(String.format("There is no user with user_id = %d", bookActivityStatusRequest.getUserId()));
+
+        if (!booksRepository.existsById(bookActivityStatusRequest.getIsbn()))
+            throw new ValidationException(String.format("There is no book with isbn = %d", bookActivityStatusRequest.getIsbn()));
 
         if (userBookmarksRepository.existsByUserIdAndBookIsbnAndCurrentPageAndAudioTime(bookActivityStatusRequest.getUserId(),
                                                                                         bookActivityStatusRequest.getIsbn(),
