@@ -24,10 +24,7 @@ public interface BooksMapper {
     BookActivityStatus map(UserBookmarks userBookmarks);
 
     @Mapping(target = "book.isbn", source = "isbn")
-    UserBookmarks mapWithNoCurrentTimestamp(BookActivityStatusRequest bookActivityStatusRequest);
-
-    @Mapping(target = "book.isbn", source = "isbn")
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
-    UserBookmarks mapWithCurrentTimestamp(BookActivityStatusRequest bookActivityStatusRequest);
+    UserBookmarks map(BookActivityStatusRequest bookActivityStatusRequest);
 
 }

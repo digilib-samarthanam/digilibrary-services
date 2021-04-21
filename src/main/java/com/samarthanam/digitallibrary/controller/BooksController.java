@@ -1,14 +1,11 @@
 package com.samarthanam.digitallibrary.controller;
 
 
+import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
+import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
-
-import com.samarthanam.digitallibrary.constant.BookType;
-
-
-import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.HomePageResponse;
 import com.samarthanam.digitallibrary.service.BookService;
 import com.samarthanam.digitallibrary.service.UsersBookService;
@@ -73,6 +70,7 @@ public class BooksController {
                 .recentlyAddedBooks(bookService.recentlyAddedBooks(page, perPage, bookType))
                 .build();
     }
+
     @GetMapping("/search")
     public List<BookResponse> searchBooks(
             @RequestParam(name = "any_book", required = false) String anyBook,
@@ -84,19 +82,14 @@ public class BooksController {
             @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
 
 
-        SearchBooksCriteria searchBooksCriteria = new SearchBooksCriteria(anyBook, bookName , category ,author , bookType ) ;
+        SearchBooksCriteria searchBooksCriteria = new SearchBooksCriteria(anyBook, bookName, category, author, bookType);
         return bookService.searchBooks(searchBooksCriteria, page, perPage);
     }
 
 
     @PostMapping("/bookmarked_books")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void bookmarkBook(
-//            @PathVariable("user_id") Integer userId,
-//            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-//            @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage,
-//            @RequestParam(name = "book_type", required = false) BookType bookType) {
-            @RequestBody BookActivityStatusRequest bookActivityStatusRequest) {
+    public void bookmarkBook(@RequestBody BookActivityStatusRequest bookActivityStatusRequest) {
 
         usersBookService.bookmarkBook(bookActivityStatusRequest);
     }

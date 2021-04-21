@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -22,5 +23,10 @@ public interface UserBookmarksRepository extends JpaRepository<UserBookmarks, In
 //    @Override
 //    @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookTypeFormat" })
 //    <S extends UserBookmarks> boolean exists(Example<S> example);
+
+    boolean existsByUserIdAndBookIsbnAndCurrentPageAndAudioTime(Integer userId,
+                                                                Integer isbn,
+                                                                Integer currentPage,
+                                                                LocalTime audioTime);
 
 }

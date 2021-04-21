@@ -11,8 +11,6 @@ public class BookActivityStatusRequest {
     private Integer isbn;
     private Integer userId;
     private Integer currentPage;
-//    private Boolean activeStatus;
     private LocalTime audioTime;
-//    private LocalDateTime updatedTimestamp;
 
 }
