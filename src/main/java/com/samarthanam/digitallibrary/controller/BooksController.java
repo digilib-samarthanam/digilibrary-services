@@ -88,10 +88,17 @@ public class BooksController {
 
 
     @PostMapping("/bookmarked_books")
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void bookmarkBook(@RequestBody BookActivityStatusRequest bookActivityStatusRequest) {
 
         usersBookService.bookmarkBook(bookActivityStatusRequest);
+    }
+
+    @PostMapping("/recently_viewed_books")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addBookToRecentlyViewed(@RequestBody BookActivityStatusRequest bookActivityStatusRequest) {
+
+        usersBookService.addBookToRecentlyViewed(bookActivityStatusRequest);
     }
 
 }

@@ -81,6 +81,7 @@ public class UsersBookService {
         log.info(String.format("Bookmarking the book isbn = %d for user id = %d",
                                bookActivityStatusRequest.getIsbn(),
                                bookActivityStatusRequest.getUserId()));
+
         if (!userRepository.existsById(bookActivityStatusRequest.getUserId()))
             throw new ValidationException(String.format("There is no user with user_id = %d", bookActivityStatusRequest.getUserId()));
 
@@ -93,8 +94,24 @@ public class UsersBookService {
                                                                                         bookActivityStatusRequest.getAudioTime()))
             throw new DuplicateBookmarkRequestException("Duplicate bookmark request, requested entry already exists");
 
-        var userBookmark = booksMapper.map(bookActivityStatusRequest);
+        var userBookmark = booksMapper.mapToUserBookmark(bookActivityStatusRequest);
         userBookmarksRepository.save(userBookmark);
+    }
+
+    public void addBookToRecentlyViewed(BookActivityStatusRequest bookActivityStatusRequest) {
+
+        log.info(String.format("Adding book (isbn = %d) to user's (id = %d) activity history",
+                               bookActivityStatusRequest.getIsbn(),
+                               bookActivityStatusRequest.getUserId()));
+
+        if (!userRepository.existsById(bookActivityStatusRequest.getUserId()))
+            throw new ValidationException(String.format("There is no user with user_id = %d", bookActivityStatusRequest.getUserId()));
+
+        if (!booksRepository.existsById(bookActivityStatusRequest.getIsbn()))
+            throw new ValidationException(String.format("There is no book with isbn = %d", bookActivityStatusRequest.getIsbn()));
+
+        var userActivityHistory = booksMapper.mapToUserActivityHistory(bookActivityStatusRequest);
+        userActivityHistoryRepository.save(userActivityHistory);
     }
 
 }
