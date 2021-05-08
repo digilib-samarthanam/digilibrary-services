@@ -25,6 +25,12 @@ public interface BooksMapper {
 
     @Mapping(target = "book.isbn", source = "isbn")
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
-    UserBookmarks map(BookActivityStatusRequest bookActivityStatusRequest);
+    UserBookmarks mapToUserBookmark(BookActivityStatusRequest bookActivityStatusRequest);
+
+    @Mapping(target = "activeStatus", constant = "true")
+    @Mapping(target = "book.isbn", source = "isbn")
+    @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
+    @Mapping(target = "updatedTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
+    UserActivityHistory mapToUserActivityHistory(BookActivityStatusRequest bookActivityStatusRequest);
 
 }
