@@ -7,6 +7,8 @@ import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.HomePageResponse;
+import com.samarthanam.digitallibrary.entity.Author;
+import com.samarthanam.digitallibrary.entity.Category;
 import com.samarthanam.digitallibrary.service.BookService;
 import com.samarthanam.digitallibrary.service.UsersBookService;
 import io.swagger.annotations.ApiOperation;
@@ -99,6 +101,22 @@ public class BooksController {
     public void addBookToRecentlyViewed(@RequestBody BookActivityStatusRequest bookActivityStatusRequest) {
 
         usersBookService.addBookToRecentlyViewed(bookActivityStatusRequest);
+    }
+
+    @GetMapping("/book_categories")
+    public List<Category> getBookCategories(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "-1") int perPage) {
+
+        return bookService.getBookCategories(page, perPage);
+    }
+
+    @GetMapping("/authors")
+    public List<Author> getAuthors(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "-1") int perPage) {
+
+        return bookService.getAuthors(page, perPage);
     }
 
 }
