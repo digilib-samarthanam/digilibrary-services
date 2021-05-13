@@ -1,11 +1,14 @@
 package com.samarthanam.digitallibrary.service;
 
-
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
+import com.samarthanam.digitallibrary.entity.Author;
 import com.samarthanam.digitallibrary.entity.Book;
+import com.samarthanam.digitallibrary.entity.Category;
+import com.samarthanam.digitallibrary.repository.AuthorsRepository;
 import com.samarthanam.digitallibrary.repository.BooksRepository;
+import com.samarthanam.digitallibrary.repository.CategoriesRepository;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -31,6 +34,12 @@ public class BookService {
     private BooksRepository booksRepository;
 
     @Autowired
+    private CategoriesRepository categoriesRepository;
+
+    @Autowired
+    private AuthorsRepository authorsRepository;
+
+    @Autowired
     private EntityManager entityManager;
 
     @Autowired
@@ -52,6 +61,13 @@ public class BookService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public List<Category> getBookCategories(int page, int perPage) {
+        return categoriesRepository.findAllByOrderByCategoryName(PageRequest.of(page, perPage));
+    }
+
+    public List<Author> getAuthors(int page, int perPage) {
+        return authorsRepository.findAllByOrderByFirstNameAscLastNameAsc(PageRequest.of(page, perPage));
+    }
 
     public List<BookResponse> searchBooks(SearchBooksCriteria searchBooksCriteria, int page, int perPage) {
 

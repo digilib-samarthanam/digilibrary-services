@@ -106,7 +106,7 @@ public class BooksController {
     @GetMapping("/book_categories")
     public List<Category> getBookCategories(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "per_page", required = false, defaultValue = "-1") int perPage) {
+            @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
         return bookService.getBookCategories(page, perPage);
     }
@@ -114,7 +114,7 @@ public class BooksController {
     @GetMapping("/authors")
     public List<Author> getAuthors(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "per_page", required = false, defaultValue = "-1") int perPage) {
+            @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
         return bookService.getAuthors(page, perPage);
     }
