@@ -45,8 +45,8 @@ public class User {
     @Column(name = "email_verified")
     private boolean emailVerified;
 
-    @Column(name = "admin_approved")
-    private boolean adminApproved;
+    @Column(name = "is_admin")
+    private boolean isAdmin;
 
     @Column(name = "created_date")
     private Long createDate;

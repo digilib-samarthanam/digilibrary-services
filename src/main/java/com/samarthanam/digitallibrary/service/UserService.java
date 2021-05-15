@@ -90,7 +90,7 @@ public class UserService {
         if (dbUser != null && encryptedPassword.equals(dbUser.getUserPassword())) {
             if (dbUser.isEmailVerified()) {
                 UserLoginToken userLoginToken = new UserLoginToken(dbUser.getFirstName(), dbUser.getLastName(),
-                        dbUser.getGender(), dbUser.getEmailAddress().toLowerCase(), dbUser.getUserSeqId());
+                        dbUser.getGender(), dbUser.getEmailAddress().toLowerCase(), dbUser.getUserSeqId(), dbUser.isAdmin());
                 String token = tokenService.createJwtToken(userLoginToken);
                 return new UserLoginResponseDto(token);
             } else {
@@ -160,7 +160,7 @@ public class UserService {
                 .emailAddress(userSignupRequestDto.getEmailAddress().toLowerCase())
                 .gender(userSignupRequestDto.getGender())
                 .emailVerified(false)
-                .adminApproved(false)
+                .isAdmin(false)
                 .createDate(createDate)
                 .build();
     }
