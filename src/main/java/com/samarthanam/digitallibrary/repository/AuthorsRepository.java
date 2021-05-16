@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface AuthorsRepository extends JpaRepository<Author, Integer> {
 
-    List<Author> findAllByOrderByFirstNameAscLastNameAsc(Pageable pageRequest);
+    List<Author> findAllByOrderByName(Pageable pageRequest);
 
 }

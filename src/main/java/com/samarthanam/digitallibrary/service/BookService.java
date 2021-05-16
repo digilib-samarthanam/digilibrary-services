@@ -66,7 +66,7 @@ public class BookService {
     }
 
     public List<Author> getAuthors(int page, int perPage) {
-        return authorsRepository.findAllByOrderByFirstNameAscLastNameAsc(PageRequest.of(page, perPage));
+        return authorsRepository.findAllByOrderByName(PageRequest.of(page, perPage));
     }
 
     public List<BookResponse> searchBooks(SearchBooksCriteria searchBooksCriteria, int page, int perPage) {

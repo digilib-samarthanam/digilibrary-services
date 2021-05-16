@@ -22,23 +22,8 @@ public class Author implements Serializable {
     @Column(name = "author_id")
     private Integer authorId;
 
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Column(name = "country")
-    private String country;
-
-    @Column(name = "dob")
-    private LocalDateTime dateOfBirth;
-
-    @Column(name = "dod")
-    private String dod;
-
-    @Column(name = "update_ts")
-    private LocalDateTime updatedTimestamp;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "create_ts")
     private LocalDateTime createdTimestamp;

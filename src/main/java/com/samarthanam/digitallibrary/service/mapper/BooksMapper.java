@@ -13,7 +13,7 @@ import org.mapstruct.NullValueCheckStrategy;
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface BooksMapper {
 
-    @Mapping(target = "author", expression = "java(book.getAuthor().getFirstName() + \" \" + book.getAuthor().getLastName())")
+    @Mapping(target = "author", source = "author.name")
     @Mapping(target = "category", source = "category.categoryName")
     @Mapping(target = "bookType", expression = "java(book.getBookTypeFormat().getBookTypeDescription().toString())")
     @Mapping(target = "thumbnailUrl", ignore = true)
