@@ -2,6 +2,7 @@ package com.samarthanam.digitallibrary.controller;
 
 
 import com.samarthanam.digitallibrary.constant.BookType;
+import com.samarthanam.digitallibrary.dto.request.BookCreateRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
@@ -117,6 +118,13 @@ public class BooksController {
             @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
         return bookService.getAuthors(page, perPage);
+    }
+
+    @PostMapping("/books")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void createBook(@RequestBody BookCreateRequest bookCreateRequest) {
+
+        bookService.createBook(bookCreateRequest);
     }
 
 }
