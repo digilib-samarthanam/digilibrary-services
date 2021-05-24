@@ -21,7 +21,7 @@ public class BookResponse {
     private LocalDateTime updatedTimestamp;
     private LocalDateTime createdTimestamp;
     private Integer totalPages;
-    private LocalTime totalAudioTime;
+    private String totalAudioTime;
     private String fileName;
     private String thumbnailUrl;
 

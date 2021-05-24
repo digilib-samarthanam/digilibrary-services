@@ -162,7 +162,7 @@ public class BookService {
 
     public void createBook(@RequestBody BookCreateRequest bookCreateRequest) {
 
-        if (!booksRepository.existsById(bookCreateRequest.getIsbn()))
+        if (booksRepository.existsById(bookCreateRequest.getIsbn()))
             throw new ValidationException(String.format("There is already an book present with isbn = %d", bookCreateRequest.getIsbn()));
 
         if (!authorsRepository.existsById(bookCreateRequest.getAuthorId()))

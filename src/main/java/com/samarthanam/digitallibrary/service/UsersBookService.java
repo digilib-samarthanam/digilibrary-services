@@ -88,13 +88,13 @@ public class UsersBookService {
         if (!booksRepository.existsById(bookActivityStatusRequest.getIsbn()))
             throw new ValidationException(String.format("There is no book with isbn = %d", bookActivityStatusRequest.getIsbn()));
 
-        if (userBookmarksRepository.existsByUserIdAndBookIsbnAndCurrentPageAndAudioTime(bookActivityStatusRequest.getUserId(),
-                                                                                        bookActivityStatusRequest.getIsbn(),
-                                                                                        bookActivityStatusRequest.getCurrentPage(),
-                                                                                        bookActivityStatusRequest.getAudioTime()))
+        var userBookmark = booksMapper.mapToUserBookmark(bookActivityStatusRequest);
+        if (userBookmarksRepository.existsByUserIdAndBookIsbnAndCurrentPageAndAudioTime(userBookmark.getUserId(),
+                                                                                        userBookmark.getBook().getIsbn(),
+                                                                                        userBookmark.getCurrentPage(),
+                                                                                        userBookmark.getAudioTime()))
             throw new DuplicateBookmarkRequestException("Duplicate bookmark request, requested entry already exists");
 
-        var userBookmark = booksMapper.mapToUserBookmark(bookActivityStatusRequest);
         userBookmarksRepository.save(userBookmark);
     }
 
