@@ -8,19 +8,21 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ValidationException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler {
 
 
     @ExceptionHandler(AbstractServiceException.class)
@@ -34,6 +36,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, httpStatus);
     }
 
+
     @ExceptionHandler({
             MissingRequestHeaderException.class,
             NoSuchElementException.class,
@@ -45,4 +48,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn(e.getMessage());
         return new ResponseEntity<>(new GenericErrorResponseDto(e.getMessage(), "400"), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final ResponseEntity<GenericErrorResponseDto> handleException(MethodArgumentNotValidException e) {
+
+        var sb = new StringBuilder();
+        List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+        for(FieldError fieldError: fieldErrors){
+            sb.append(fieldError.getField());
+            sb.append(" ");
+            sb.append(fieldError.getDefaultMessage());
+            sb.append(";");
+        }
+
+        log.warn(sb.toString());
+        return new ResponseEntity<>(new GenericErrorResponseDto(sb.toString(), "400"), HttpStatus.BAD_REQUEST);
+    }
+
 }
