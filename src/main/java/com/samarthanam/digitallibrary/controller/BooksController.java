@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @ApiOperation("Books Management")
@@ -122,7 +123,7 @@ public class BooksController {
 
     @PostMapping("/books")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createBook(@RequestBody BookCreateRequest bookCreateRequest) {
+    public void createBook(@RequestBody @Valid BookCreateRequest bookCreateRequest) {
 
         bookService.createBook(bookCreateRequest);
     }
