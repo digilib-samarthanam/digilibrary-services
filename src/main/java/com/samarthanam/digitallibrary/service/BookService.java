@@ -18,7 +18,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -26,15 +26,20 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.validation.Valid;
 import javax.validation.ValidationException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE;
+
 @Service
 @Slf4j
+@Validated
 public class BookService {
     private static final BooksMapper booksMapper = Mappers.getMapper(BooksMapper.class);
 
@@ -153,16 +158,49 @@ public class BookService {
         return predicateList;
     }
 
-    public void createBook(@RequestBody BookCreateRequest bookCreateRequest) {
+    public void createBook(@Valid BookCreateRequest bookCreateRequest) {
 
         if (booksRepository.existsById(bookCreateRequest.getIsbn()))
             throw new ValidationException(String.format("There is already an book present with isbn = %d", bookCreateRequest.getIsbn()));
 
-        if (!authorsRepository.existsById(bookCreateRequest.getAuthorId()))
-            throw new ValidationException(String.format("There is no author with author_id = %d", bookCreateRequest.getAuthorId()));
-
         if (!categoriesRepository.existsById(bookCreateRequest.getCategoryId()))
             throw new ValidationException(String.format("There is no category with category_id = %d", bookCreateRequest.getCategoryId()));
+
+        if (bookCreateRequest.getAuthorId() != null) {
+
+            if (bookCreateRequest.getAuthorName() != null)
+                throw new ValidationException("Please provide only one attribute out of [ author_id, author_name ]");
+
+            if (!authorsRepository.existsById(bookCreateRequest.getAuthorId()))
+                throw new ValidationException(String.format("There is no author with author_id = %d", bookCreateRequest.getAuthorId()));
+
+        } else if (bookCreateRequest.getAuthorName() == null)
+            throw new ValidationException("Both attributes author_id and author_name are missing");
+
+        else {
+            var author = authorsRepository.findFirstByNameIgnoreCase(bookCreateRequest.getAuthorName())
+                    .orElseGet(() -> authorsRepository.save(Author.builder()
+                                                                    .name(bookCreateRequest.getAuthorName())
+                                                                    .createdTimestamp(LocalDateTime.now(INDIA_TIME_ZONE))
+                                                                    .build()));
+
+            bookCreateRequest.setAuthorId(author.getAuthorId());
+        }
+
+        switch (bookCreateRequest.getBookType()) {
+            case PDF:
+                if (bookCreateRequest.getTotalAudioTime() != null)
+                    throw new ValidationException("PDF Books can not have total_audio_time");
+                else if (bookCreateRequest.getTotalPages() == null)
+                    throw new ValidationException("PDF Books must have total_pages");
+                break;
+
+            case AUDIO_BOOK:
+                if (bookCreateRequest.getTotalPages() != null)
+                    throw new ValidationException("Audio Books can not have total_pages");
+                else if (bookCreateRequest.getTotalAudioTime() == null)
+                    throw new ValidationException("Audio Books must have total_audio_time");
+        }
 
         var book = booksMapper.map(bookCreateRequest);
         book.setBookTypeFormat(bookTypes.get(bookCreateRequest.getBookType()));
