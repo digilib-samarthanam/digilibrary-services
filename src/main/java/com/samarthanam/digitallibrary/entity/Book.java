@@ -27,9 +27,6 @@ public class Book {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "book_status_id")
-    private Integer bookStatusId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_type_code")
     private BookTypeFormat bookTypeFormat;

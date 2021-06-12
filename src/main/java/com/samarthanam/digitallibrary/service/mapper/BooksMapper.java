@@ -19,7 +19,6 @@ public interface BooksMapper {
     @Mapping(target = "category.categoryId", source = "categoryId")
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
     @Mapping(target = "updatedTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
-    @Mapping(target = "bookStatusId", constant = "1")
     @Mapping(target = "bookTypeFormat", ignore = true)
     Book map(BookCreateRequest bookCreateRequest);
 
