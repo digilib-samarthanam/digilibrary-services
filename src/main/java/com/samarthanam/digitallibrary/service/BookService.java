@@ -163,6 +163,11 @@ public class BookService {
         if (booksRepository.existsById(bookCreateRequest.getIsbn()))
             throw new ValidationException(String.format("There is already an book present with isbn = %d", bookCreateRequest.getIsbn()));
 
+        saveBook(bookCreateRequest);
+    }
+
+    private void saveBook(@Valid BookCreateRequest bookCreateRequest) {
+
         if (!categoriesRepository.existsById(bookCreateRequest.getCategoryId()))
             throw new ValidationException(String.format("There is no category with category_id = %d", bookCreateRequest.getCategoryId()));
 
@@ -206,6 +211,14 @@ public class BookService {
         book.setBookTypeFormat(bookTypes.get(bookCreateRequest.getBookType()));
 
         booksRepository.save(book);
+    }
+
+    public void updateBook(@Valid BookCreateRequest bookCreateRequest) {
+
+        if (!booksRepository.existsById(bookCreateRequest.getIsbn()))
+            throw new ValidationException(String.format("We couldn't find any book with isbn = %d", bookCreateRequest.getIsbn()));
+
+        saveBook(bookCreateRequest);
     }
 
 }

@@ -128,4 +128,13 @@ public class BooksController {
         bookService.createBook(bookCreateRequest);
     }
 
+    @PutMapping("/books/{isbn}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void createBook(@PathVariable @Positive Integer isbn,
+            @RequestBody @Valid BookCreateRequest bookCreateRequest) {
+
+        bookCreateRequest.setIsbn(isbn);
+        bookService.updateBook(bookCreateRequest);
+    }
+
 }
