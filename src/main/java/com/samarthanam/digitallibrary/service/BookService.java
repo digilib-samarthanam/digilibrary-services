@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -28,6 +29,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -80,8 +82,8 @@ public class BookService {
     public List<BookResponse> recentlyAddedBooks(int page, int perPage, BookType bookType) {
 
         log.info("Querying recently added books from database");
-        var books = bookType == null ? booksRepository.findByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
-                : booksRepository.findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
+        var books = bookType == null ? booksRepository.findByActiveTrueOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
+                : booksRepository.findByActiveTrueAndBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
 
         return books.stream()
                 .map(bookEntity -> {
@@ -226,9 +228,9 @@ public class BookService {
 
     public void disableBook(@PathVariable @Positive Integer isbn) {
 
-        log.info("Disabling the book with ISBN : " + bookCreateRequest.getIsbn() + " in database");
-        var book = booksRepository.findById(bookCreateRequest.getIsbn())
-                .orElseThrow(() -> new ValidationException(String.format("We couldn't find any book with isbn = %d", isbn())));
+        log.info("Disabling the book with ISBN : " + isbn + " in database");
+        var book = booksRepository.findById(isbn)
+                .orElseThrow(() -> new ValidationException(String.format("We couldn't find any book with isbn = %d", isbn)));
 
         book.setActive(false);
         booksRepository.save(book);

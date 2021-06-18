@@ -27,9 +27,6 @@ public class UserActivityHistory {
     @Column(name = "current_page")
     private Integer currentPage;
 
-    @Column(name = "active_status")
-    private Boolean activeStatus;
-
     @Column(name = "audio_time")
     private LocalTime audioTime;
 

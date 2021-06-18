@@ -13,9 +13,9 @@ import java.util.List;
 public interface BooksRepository extends JpaRepository<Book, Integer> {
 
     @EntityGraph(attributePaths = {"author", "category", "bookTypeFormat"})
-    List<Book> findByOrderByCreatedTimestampDesc(Pageable pageRequest);
+    List<Book> findByActiveTrueOrderByCreatedTimestampDesc(Pageable pageRequest);
 
     @EntityGraph(attributePaths = {"author", "category", "bookTypeFormat"})
-    List<Book> findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(BookType bookType, Pageable pageRequest);
+    List<Book> findByActiveTrueAndBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(BookType bookType, Pageable pageRequest);
 
 }

@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @ApiOperation("Books Management")
@@ -29,7 +30,6 @@ public class BooksController {
 
     @Autowired
     private UsersBookService usersBookService;
-
 
     @GetMapping("/recently_added_books")
     public List<BookResponse> recentlyAddedBooks(
@@ -130,7 +130,7 @@ public class BooksController {
     @PutMapping("/books/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createBook(@PathVariable @Positive Integer isbn,
-            @RequestBody @Valid BookCreateRequest bookCreateRequest) {
+            @RequestBody BookCreateRequest bookCreateRequest) {
 
         bookCreateRequest.setIsbn(isbn);
         bookService.updateBook(bookCreateRequest);
@@ -140,7 +140,7 @@ public class BooksController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void disableBook(@PathVariable @Positive Integer isbn) {
 
-        bookService.disableBook(bookCreateRequest);
+        bookService.disableBook(isbn);
     }
 
 }
