@@ -66,6 +66,7 @@ public class BookService {
     @PostConstruct
     private void cacheBookTypes() {
 
+        log.info("Caching Book Types on boot up");
         bookTypes = bookTypeFormatsRepository.findAll()
                 .stream()
                 .collect(Collectors.toMap(BookTypeFormat::getBookTypeDescription,
@@ -160,6 +161,7 @@ public class BookService {
 
     public void createBook(@Valid BookCreateRequest bookCreateRequest) {
 
+        log.info("Inserting a new book in database; ISBN : " + bookCreateRequest.getIsbn());
         if (booksRepository.existsById(bookCreateRequest.getIsbn()))
             throw new ValidationException(String.format("There is already an book present with isbn = %d", bookCreateRequest.getIsbn()));
 
@@ -215,10 +217,21 @@ public class BookService {
 
     public void updateBook(@Valid BookCreateRequest bookCreateRequest) {
 
+        log.info("Updating the book details in database for ISBN : " + bookCreateRequest.getIsbn());
         if (!booksRepository.existsById(bookCreateRequest.getIsbn()))
             throw new ValidationException(String.format("We couldn't find any book with isbn = %d", bookCreateRequest.getIsbn()));
 
         saveBook(bookCreateRequest);
+    }
+
+    public void disableBook(@PathVariable @Positive Integer isbn) {
+
+        log.info("Disabling the book with ISBN : " + bookCreateRequest.getIsbn() + " in database");
+        var book = booksRepository.findById(bookCreateRequest.getIsbn())
+                .orElseThrow(() -> new ValidationException(String.format("We couldn't find any book with isbn = %d", isbn())));
+
+        book.setActive(false);
+        booksRepository.save(book);
     }
 
 }

@@ -58,6 +58,9 @@ public class Book {
     @Column(name = "file_name")
     private String fileName;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     public String getFileName() {
         return bookTypeFormat.getBookTypeDescription().fileNameWithExtension(fileName);
     }

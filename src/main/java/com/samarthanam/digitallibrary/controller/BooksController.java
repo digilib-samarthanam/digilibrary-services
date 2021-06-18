@@ -1,6 +1,5 @@
 package com.samarthanam.digitallibrary.controller;
 
-
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookCreateRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
@@ -135,6 +134,13 @@ public class BooksController {
 
         bookCreateRequest.setIsbn(isbn);
         bookService.updateBook(bookCreateRequest);
+    }
+
+    @DeleteMapping("/books/{isbn}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void disableBook(@PathVariable @Positive Integer isbn) {
+
+        bookService.disableBook(bookCreateRequest);
     }
 
 }
