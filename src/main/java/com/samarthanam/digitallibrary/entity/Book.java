@@ -61,10 +61,6 @@ public class Book {
     @Column(name = "active")
     private Boolean active;
 
-    public String getFileName() {
-        return bookTypeFormat.getBookTypeDescription().fileNameWithExtension(fileName);
-    }
-
     public String getThumbnailFileName() {
         return fileName + ".jpg";
     }
