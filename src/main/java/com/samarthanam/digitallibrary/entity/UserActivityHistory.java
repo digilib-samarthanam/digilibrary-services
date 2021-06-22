@@ -3,13 +3,15 @@ package com.samarthanam.digitallibrary.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "user_activity_history")
 @Data
-public class UserActivityHistory {
+@IdClass(UserActivityId.class)
+public class UserActivityHistory implements Serializable {
 
     @Id
     @Column(name = "user_id")

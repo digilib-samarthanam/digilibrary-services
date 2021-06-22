@@ -29,21 +29,18 @@ public interface BooksMapper {
     @Mapping(target = "thumbnailUrl", ignore = true)
     BookResponse map(Book book);
 
-
-    @Mapping(target = "updatedTimestamp", ignore = true)
     BookActivityStatus map(UserActivityHistory userActivityHistory);
 
+    @Mapping(target = "updatedTimestamp", ignore = true)
     BookActivityStatus map(UserBookmarks userBookmarks);
 
     @Mapping(target = "book.isbn", source = "isbn")
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
-    @Mapping(target = "userBookmarksId", ignore = true)
     UserBookmarks mapToUserBookmark(BookActivityStatusRequest bookActivityStatusRequest);
 
     @Mapping(target = "book.isbn", source = "isbn")
     @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
     @Mapping(target = "updatedTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
-    @Mapping(target = "userActivityHistoryId", ignore = true)
     UserActivityHistory mapToUserActivityHistory(BookActivityStatusRequest bookActivityStatusRequest);
 
 }

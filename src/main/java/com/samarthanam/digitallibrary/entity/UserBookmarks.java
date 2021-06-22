@@ -9,17 +9,14 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "user_bookmarks")
 @Data
+@IdClass(UserActivityId.class)
 public class UserBookmarks {
 
     @Id
-    @Column(name = "user_bookmarks_id")
-    @SequenceGenerator(name = "seq", sequenceName = "user_bookmarks_id_seq", allocationSize=1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    private Integer userBookmarksId;
-
     @Column(name = "user_id")
     private Integer userId;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "isbn")
     private Book book;

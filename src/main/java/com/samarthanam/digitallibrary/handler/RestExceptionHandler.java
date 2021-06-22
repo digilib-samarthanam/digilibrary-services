@@ -2,7 +2,6 @@ package com.samarthanam.digitallibrary.handler;
 
 import com.samarthanam.digitallibrary.dto.response.GenericErrorResponseDto;
 import com.samarthanam.digitallibrary.exception.AbstractServiceException;
-import com.samarthanam.digitallibrary.exception.DuplicateBookmarkRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -41,8 +40,7 @@ public class RestExceptionHandler {
             MissingRequestHeaderException.class,
             NoSuchElementException.class,
             ValidationException.class,
-            MethodArgumentTypeMismatchException.class,
-            DuplicateBookmarkRequestException.class
+            MethodArgumentTypeMismatchException.class
     })
     public final ResponseEntity<GenericErrorResponseDto> handleException(Exception e) {
         log.warn(e.getMessage());

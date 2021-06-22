@@ -5,7 +5,6 @@ import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
 import com.samarthanam.digitallibrary.entity.UserActivityHistory;
 import com.samarthanam.digitallibrary.entity.UserBookmarks;
-import com.samarthanam.digitallibrary.exception.DuplicateBookmarkRequestException;
 import com.samarthanam.digitallibrary.repository.BooksRepository;
 import com.samarthanam.digitallibrary.repository.UserActivityHistoryRepository;
 import com.samarthanam.digitallibrary.repository.UserBookmarksRepository;
@@ -89,12 +88,6 @@ public class UsersBookService {
             throw new ValidationException(String.format("There is no book with isbn = %d", bookActivityStatusRequest.getIsbn()));
 
         var userBookmark = booksMapper.mapToUserBookmark(bookActivityStatusRequest);
-        if (userBookmarksRepository.existsByUserIdAndBookIsbnAndCurrentPageAndAudioTime(userBookmark.getUserId(),
-                                                                                        userBookmark.getBook().getIsbn(),
-                                                                                        userBookmark.getCurrentPage(),
-                                                                                        userBookmark.getAudioTime()))
-            throw new DuplicateBookmarkRequestException("Duplicate bookmark request, requested entry already exists");
-
         userBookmarksRepository.save(userBookmark);
     }
 
