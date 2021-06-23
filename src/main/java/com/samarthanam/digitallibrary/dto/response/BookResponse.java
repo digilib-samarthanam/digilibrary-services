@@ -9,9 +9,11 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookResponse {
 
-    private String author;
+    private String authorName;
+    private String authorId;
     private Integer isbn;
-    private String category;
+    private String categoryName;
+    private String categoryId;
     private String bookType;
     private String title;
     private String year;
