@@ -4,7 +4,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.amazonaws.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -54,7 +53,7 @@ public class AWSCloudService {
             logger.info("File upload is completed.");
             file.delete();
         } catch (final AmazonServiceException ex) {
-
+            
             logger.severe("Error= {} while uploading file..." + ex.getMessage());
         }
     }
@@ -71,15 +70,16 @@ public class AWSCloudService {
     }
 
     private void uploadFileToS3Bucket(final String bucketName, final File file) {
+        
         final String uniqueFileName = file.getName();
         logger.info("Uploading file with name= " + uniqueFileName);
-        //System.out.println("Uploading file with name= " + uniqueFileName);
         final PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, uniqueFileName, file);
         amazonS3.putObject(putObjectRequest);
     }
 
 
     public List<String> getObjects(final String bucketName) {
+
         ObjectListing objectListing = amazonS3.listObjects(bucketName);
         List<String> keyList = new ArrayList<String>();
         for (S3ObjectSummary os : objectListing.getObjectSummaries()) {
