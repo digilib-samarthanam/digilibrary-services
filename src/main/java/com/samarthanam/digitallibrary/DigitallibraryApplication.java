@@ -8,6 +8,8 @@ public class DigitallibraryApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DigitallibraryApplication.class, args);
+		System.out.println(System.getenv("DB_PASS"));
+		System.out.println(System.getenv("TEST_VARIABLE"));
 	}
 
 }
