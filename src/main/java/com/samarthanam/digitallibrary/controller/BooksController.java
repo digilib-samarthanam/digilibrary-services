@@ -138,9 +138,9 @@ public class BooksController {
 
     @DeleteMapping("/books/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void disableBook(@PathVariable @Positive Integer isbn) {
+    public void deleteBook(@PathVariable @Positive Integer isbn) {
 
-        bookService.disableBook(isbn);
+        bookService.deleteBook(isbn);
     }
 
 }

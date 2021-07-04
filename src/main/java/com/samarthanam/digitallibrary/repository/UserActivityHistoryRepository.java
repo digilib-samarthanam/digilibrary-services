@@ -18,4 +18,6 @@ public interface UserActivityHistoryRepository extends JpaRepository<UserActivit
     @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookTypeFormat" })
     List<UserActivityHistory> findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByUpdatedTimestamp(Integer userId, BookType bookType, Pageable pageRequest);
 
+    void deleteByBookIsbn(Integer isbn);
+
 }

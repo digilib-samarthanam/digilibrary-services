@@ -8,16 +8,14 @@ import com.samarthanam.digitallibrary.entity.Author;
 import com.samarthanam.digitallibrary.entity.Book;
 import com.samarthanam.digitallibrary.entity.BookTypeFormat;
 import com.samarthanam.digitallibrary.entity.Category;
-import com.samarthanam.digitallibrary.repository.AuthorsRepository;
-import com.samarthanam.digitallibrary.repository.BookTypeFormatsRepository;
-import com.samarthanam.digitallibrary.repository.BooksRepository;
-import com.samarthanam.digitallibrary.repository.CategoriesRepository;
+import com.samarthanam.digitallibrary.repository.*;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -47,6 +45,12 @@ public class BookService {
 
     @Autowired
     private BooksRepository booksRepository;
+
+    @Autowired
+    private UserBookmarksRepository userBookmarksRepository;
+
+    @Autowired
+    private UserActivityHistoryRepository userActivityHistoryRepository;
 
     @Autowired
     private CategoriesRepository categoriesRepository;
@@ -226,14 +230,16 @@ public class BookService {
         saveBook(bookCreateRequest);
     }
 
-    public void disableBook(@PathVariable @Positive Integer isbn) {
+    @Transactional
+    public void deleteBook(@PathVariable @Positive Integer isbn) {
 
-        log.info("Disabling the book with ISBN : " + isbn + " in database");
-        var book = booksRepository.findById(isbn)
-                .orElseThrow(() -> new ValidationException(String.format("We couldn't find any book with isbn = %d", isbn)));
+        log.info("Deleting the book with ISBN : " + isbn + " in database");
+        if (!booksRepository.existsById(isbn))
+            throw new ValidationException(String.format("We couldn't find any book with isbn = %d", isbn));
 
-        book.setActive(false);
-        booksRepository.save(book);
+        userBookmarksRepository.deleteByBookIsbn(isbn);
+        userActivityHistoryRepository.deleteByBookIsbn(isbn);
+        booksRepository.deleteById(isbn);
     }
 
 }
