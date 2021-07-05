@@ -59,9 +59,6 @@ public class Book implements Serializable {
     @Column(name = "file_name")
     private String fileName;
 
-    @Column(name = "active")
-    private Boolean active;
-
     public String getThumbnailFileName() {
         return fileName + ".jpg";
     }

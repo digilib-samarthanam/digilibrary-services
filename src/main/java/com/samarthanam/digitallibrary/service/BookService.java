@@ -1,7 +1,7 @@
 package com.samarthanam.digitallibrary.service;
 
 import com.samarthanam.digitallibrary.constant.BookType;
-import com.samarthanam.digitallibrary.dto.request.BookCreateRequest;
+import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.entity.Author;
@@ -86,8 +86,8 @@ public class BookService {
     public List<BookResponse> recentlyAddedBooks(int page, int perPage, BookType bookType) {
 
         log.info("Querying recently added books from database");
-        var books = bookType == null ? booksRepository.findByActiveTrueOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
-                : booksRepository.findByActiveTrueAndBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
+        var books = bookType == null ? booksRepository.findByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
+                : booksRepository.findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
 
         return books.stream()
                 .map(bookEntity -> {
@@ -165,69 +165,60 @@ public class BookService {
         return predicateList;
     }
 
-    public void createBook(@Valid BookCreateRequest bookCreateRequest) {
+    public void createBook(@Valid BookRequest bookRequest) {
 
-        log.info("Inserting a new book in database; ISBN : " + bookCreateRequest.getIsbn());
-        if (booksRepository.existsById(bookCreateRequest.getIsbn()))
-            throw new ValidationException(String.format("There is already an book present with isbn = %d", bookCreateRequest.getIsbn()));
+        log.info("Inserting a new book in database; ISBN : " + bookRequest.getIsbn());
+        if (booksRepository.existsById(bookRequest.getIsbn()))
+            throw new ValidationException(String.format("There is already an book present with isbn = %d", bookRequest.getIsbn()));
 
-        saveBook(bookCreateRequest);
+        saveBook(bookRequest, LocalDateTime.now(INDIA_TIME_ZONE));
     }
 
-    private void saveBook(@Valid BookCreateRequest bookCreateRequest) {
+    private void saveBook(@Valid BookRequest bookRequest, LocalDateTime createdTimestamp) {
 
-        if (!categoriesRepository.existsById(bookCreateRequest.getCategoryId()))
-            throw new ValidationException(String.format("There is no category with category_id = %d", bookCreateRequest.getCategoryId()));
-
-        if (bookCreateRequest.getAuthorId() != null) {
-
-            if (bookCreateRequest.getAuthorName() != null)
-                throw new ValidationException("Please provide only one attribute out of [ author_id, author_name ]");
-
-            if (!authorsRepository.existsById(bookCreateRequest.getAuthorId()))
-                throw new ValidationException(String.format("There is no author with author_id = %d", bookCreateRequest.getAuthorId()));
-
-        } else if (bookCreateRequest.getAuthorName() == null)
-            throw new ValidationException("Both attributes author_id and author_name are missing");
-
-        else {
-            var author = authorsRepository.findFirstByNameIgnoreCase(bookCreateRequest.getAuthorName())
-                    .orElseGet(() -> authorsRepository.save(Author.builder()
-                                                                    .name(bookCreateRequest.getAuthorName())
-                                                                    .createdTimestamp(LocalDateTime.now(INDIA_TIME_ZONE))
-                                                                    .build()));
-
-            bookCreateRequest.setAuthorId(author.getAuthorId());
-        }
-
-        switch (bookCreateRequest.getBookType()) {
+        switch (bookRequest.getBookType()) {
             case PDF:
-                if (bookCreateRequest.getTotalAudioTime() != null)
+                if (bookRequest.getTotalAudioTime() != null)
                     throw new ValidationException("PDF Books can not have total_audio_time");
-                else if (bookCreateRequest.getTotalPages() == null)
+                else if (bookRequest.getTotalPages() == null)
                     throw new ValidationException("PDF Books must have total_pages");
                 break;
 
             case AUDIO_BOOK:
-                if (bookCreateRequest.getTotalPages() != null)
+                if (bookRequest.getTotalPages() != null)
                     throw new ValidationException("Audio Books can not have total_pages");
-                else if (bookCreateRequest.getTotalAudioTime() == null)
+                else if (bookRequest.getTotalAudioTime() == null)
                     throw new ValidationException("Audio Books must have total_audio_time");
         }
 
-        var book = booksMapper.map(bookCreateRequest);
-        book.setBookTypeFormat(bookTypes.get(bookCreateRequest.getBookType()));
+        var book = booksMapper.map(bookRequest);
 
+        var author = authorsRepository.findFirstByNameIgnoreCase(bookRequest.getAuthorName())
+                .orElseGet(() -> authorsRepository.save(Author.builder()
+                                                                .name(bookRequest.getAuthorName())
+                                                                .createdTimestamp(LocalDateTime.now(INDIA_TIME_ZONE))
+                                                                .build()));
+        book.setAuthor(author);
+
+        var category = categoriesRepository.findFirstByCategoryNameIgnoreCase(bookRequest.getCategoryName())
+                .orElseGet(() -> categoriesRepository.save(Category.builder()
+                                                                .categoryName(bookRequest.getCategoryName())
+                                                                .createdTimestamp(LocalDateTime.now(INDIA_TIME_ZONE))
+                                                                .build()));
+        book.setCategory(category);
+
+        book.setCreatedTimestamp(createdTimestamp);
+        book.setBookTypeFormat(bookTypes.get(bookRequest.getBookType()));
         booksRepository.save(book);
     }
 
-    public void updateBook(@Valid BookCreateRequest bookCreateRequest) {
+    public void updateBook(@Valid BookRequest bookRequest) {
 
-        log.info("Updating the book details in database for ISBN : " + bookCreateRequest.getIsbn());
-        if (!booksRepository.existsById(bookCreateRequest.getIsbn()))
-            throw new ValidationException(String.format("We couldn't find any book with isbn = %d", bookCreateRequest.getIsbn()));
+        log.info("Updating the book details in database for ISBN : " + bookRequest.getIsbn());
+        var existingBook = booksRepository.findById(bookRequest.getIsbn())
+                .orElseThrow(() -> new ValidationException(String.format("We couldn't find any book with isbn = %d", bookRequest.getIsbn())));
 
-        saveBook(bookCreateRequest);
+        saveBook(bookRequest, existingBook.getCreatedTimestamp());
     }
 
     @Transactional
