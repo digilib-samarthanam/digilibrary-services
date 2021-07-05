@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @Data
-public class BookCreateRequest {
+public class BookRequest {
 
     @NotBlank
     private String authorName;
@@ -18,7 +18,7 @@ public class BookCreateRequest {
     private Integer isbn;
 
     @NotBlank
-    private Integer categoryName;
+    private String categoryName;
 
     @NotNull
     private BookType bookType;

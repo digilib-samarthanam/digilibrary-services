@@ -1,7 +1,7 @@
 package com.samarthanam.digitallibrary.controller;
 
 import com.samarthanam.digitallibrary.constant.BookType;
-import com.samarthanam.digitallibrary.dto.request.BookCreateRequest;
+import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
 import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
@@ -122,18 +122,18 @@ public class BooksController {
 
     @PostMapping("/books")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createBook(@RequestBody @Valid BookCreateRequest bookCreateRequest) {
+    public void createBook(@RequestBody @Valid BookRequest bookRequest) {
 
-        bookService.createBook(bookCreateRequest);
+        bookService.createBook(bookRequest);
     }
 
     @PutMapping("/books/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createBook(@PathVariable @Positive Integer isbn,
-            @RequestBody BookCreateRequest bookCreateRequest) {
+            @RequestBody BookRequest bookRequest) {
 
-        bookCreateRequest.setIsbn(isbn);
-        bookService.updateBook(bookCreateRequest);
+        bookRequest.setIsbn(isbn);
+        bookService.updateBook(bookRequest);
     }
 
     @DeleteMapping("/books/{isbn}")
