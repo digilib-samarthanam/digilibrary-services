@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @ApiOperation("User management")
 @RestController
-@CrossOrigin(origins = {"http://ec2-13-232-236-83.ap-south-1.compute.amazonaws.com:3000", "http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins = {"http://ec2-13-235-86-101.ap-south-1.compute.amazonaws.com:3000/", "http://localhost:3000"}, allowedHeaders = "*")
 @RequestMapping(value = "/user")
 public class UserController {
 
