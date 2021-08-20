@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-@CrossOrigin(origins = {"http://ec2-13-235-86-101.ap-south-1.compute.amazonaws.com:3000/", "http://localhost:3000"}, allowedHeaders = "*")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class PdfRenderController {
 
