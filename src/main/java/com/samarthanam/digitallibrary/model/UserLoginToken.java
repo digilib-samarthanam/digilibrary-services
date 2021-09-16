@@ -9,7 +9,7 @@ public class UserLoginToken extends AbstractToken {
 
     private final String firstName;
     private final String lastName;
-    private final String gender;
+    private final Character gender;
     private final String emailAddress;
     private final Integer userSequenceId;
     private final boolean isAdmin;

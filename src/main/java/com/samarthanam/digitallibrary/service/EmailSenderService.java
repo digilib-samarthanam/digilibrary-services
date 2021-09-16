@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ValidationException;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Map;
@@ -100,6 +101,7 @@ public class EmailSenderService {
         } catch (Exception ex) {
             log.error("The email was not sent. Error message: {}"
                     , ex.getMessage(), ex);
+            throw new ValidationException("Couldn't sent email to " + toEmail);
         }
     }
 }

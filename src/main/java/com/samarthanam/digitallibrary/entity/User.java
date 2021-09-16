@@ -40,7 +40,7 @@ public class User {
     private String userPassword;
 
     @Column(name = "gender")
-    private String gender;
+    private Character gender;
 
     @Column(name = "email_verified")
     private boolean emailVerified;
