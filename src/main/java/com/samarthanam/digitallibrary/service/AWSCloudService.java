@@ -5,6 +5,7 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -29,11 +30,8 @@ public class AWSCloudService {
     @Autowired
     private AmazonS3 amazonS3;
 
-    /*@Value("${s3.buckek.name}")
-    String defaultBucketName;
-
-    @Value("${s3.default.folder}")
-    String defaultBaseFolder;*/
+    @Value("${s3.bucket.name}")
+    private String bucketName;
 
     public List<Bucket> getAllBuckets() {
         return amazonS3.listBuckets();
@@ -49,7 +47,7 @@ public class AWSCloudService {
         System.out.println("file upload in progress");
         try {
             final File file = convertMultiPartFileToFile(multipartFile);
-            uploadFileToS3Bucket("samarthanampersonaldevelopment", file);
+            uploadFileToS3Bucket(bucketName, file);
             logger.info("File upload is completed.");
             file.delete();
         } catch (final AmazonServiceException ex) {
@@ -92,7 +90,7 @@ public class AWSCloudService {
 
         logger.info(() -> String.format("Generating Presigned Url for %s", fileName));
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest("samarthanampersonaldevelopment", fileName, HttpMethod.GET)
+                new GeneratePresignedUrlRequest(bucketName, fileName, HttpMethod.GET)
                         .withExpiration(Date.from(LocalDateTime.now()
                                                           .plusMinutes(60l)
                                                           .atZone(ZoneId.systemDefault())
