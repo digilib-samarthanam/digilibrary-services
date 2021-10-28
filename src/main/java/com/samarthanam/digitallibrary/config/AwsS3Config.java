@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AwsS3Config {
 
-    @Value("${s3.access.key}")
+    @Value("${aws.access.key}")
     private String accessKey;
 
-    @Value("${s3.secret.key}")
+    @Value("${aws.secret.key}")
     private String secretKey;
 
     @Bean
