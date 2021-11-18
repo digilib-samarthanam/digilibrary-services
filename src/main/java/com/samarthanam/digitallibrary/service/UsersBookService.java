@@ -61,8 +61,8 @@ public class UsersBookService {
     public List<BookActivityStatus> usersRecentlyViewedBooks(Integer userId, int page, int perPage, BookType bookType) {
 
         log.info(String.format("Querying recently viewed books for user_id = %d from database", userId));
-        var userActivityHistory = bookType == null ? userActivityHistoryRepository.findByUserIdOrderByUpdatedTimestamp(
-                userId, PageRequest.of(page, perPage)) : userActivityHistoryRepository.findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByUpdatedTimestamp(
+        var userActivityHistory = bookType == null ? userActivityHistoryRepository.findByUserIdOrderByUpdatedTimestampDesc(
+                userId, PageRequest.of(page, perPage)) : userActivityHistoryRepository.findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByUpdatedTimestampDesc(
                 userId, bookType, PageRequest.of(page, perPage));
 
         return userActivityHistory.stream()

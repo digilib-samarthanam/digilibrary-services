@@ -13,10 +13,10 @@ import java.util.List;
 public interface UserActivityHistoryRepository extends JpaRepository<UserActivityHistory, Integer> {
 
     @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookTypeFormat" })
-    List<UserActivityHistory> findByUserIdOrderByUpdatedTimestamp(Integer userId, Pageable pageRequest);
+    List<UserActivityHistory> findByUserIdOrderByUpdatedTimestampDesc(Integer userId, Pageable pageRequest);
 
     @EntityGraph(attributePaths = { "book.author", "book.category", "book.bookTypeFormat" })
-    List<UserActivityHistory> findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByUpdatedTimestamp(Integer userId, BookType bookType, Pageable pageRequest);
+    List<UserActivityHistory> findByUserIdAndBookBookTypeFormatBookTypeDescriptionOrderByUpdatedTimestampDesc(Integer userId, BookType bookType, Pageable pageRequest);
 
     void deleteByBookIsbn(Integer isbn);
 
