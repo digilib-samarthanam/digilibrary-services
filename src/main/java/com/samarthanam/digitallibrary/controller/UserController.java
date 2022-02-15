@@ -68,5 +68,12 @@ public class UserController {
         UpdatePasswordResponseDto updatePasswordResponseDto = userService.updatePassword(updatePasswordRequestDto, token);
         return new ResponseEntity<>(updatePasswordResponseDto, HttpStatus.OK);
     }
+    @RequestMapping(path = RequestConstants.PROFILE_PATH, method = RequestMethod.GET)
+    public ResponseEntity<UserProfileDto> userProfile(@PathVariable( "userId") Integer id)
+            throws Exception{
+        UserProfileDto userProfileDto = userService.getUserBySeqId(id);
+        return new ResponseEntity<>(userProfileDto,HttpStatus.OK);
+    }
+
 
 }

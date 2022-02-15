@@ -14,4 +14,6 @@ public class RequestConstants {
 
     /* Request Headers */
     public static final String APPLICATION_JSON = "application/json";
+    public static final String PROFILE_PATH = "/profile/{userId}";
+
 }

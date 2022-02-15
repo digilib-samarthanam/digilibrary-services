@@ -179,4 +179,16 @@ public class UserService {
         return templateData;
     }
 
+    public UserProfileDto getUserBySeqId(Integer seqId){
+        User userProfile= userRepository.getById(seqId);
+        UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setFirstName(userProfile.getFirstName());
+        userProfileDto.setLastName(userProfile.getLastName());
+        userProfileDto.setEmailAddress(userProfile.getEmailAddress());
+        userProfileDto.setGender(userProfile.getGender());
+        userProfileDto.setCreateDate(userProfile.getCreateDate());
+        userProfileDto.setUpdateDate(userProfile.getUpdateDate());
+        return userProfileDto;
+    }
+
 }
