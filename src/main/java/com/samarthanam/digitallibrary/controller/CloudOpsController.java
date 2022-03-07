@@ -49,5 +49,10 @@ public class CloudOpsController {
         return service.generatePresignedUrl(fileName);
     }
 
+    @GetMapping(value = "/get_bulk_upload_files")
+    public List<String> getBulkUploadFiles() {
+        return service.getFiles(bucketName, "bulk_upload_books");
+    }
+
 
 }
