@@ -86,6 +86,17 @@ public class AWSCloudService {
         return keyList;
     }
 
+    public List<String> getFiles(final String bucketName, String prefix) {
+
+        ObjectListing objectListing = amazonS3.listObjects(bucketName,prefix);
+        List<String> keyList = new ArrayList<String>();
+        for (S3ObjectSummary os : objectListing.getObjectSummaries()) {
+            if(os.getKey().matches(".*[^/]$"))
+                keyList.add(os.getKey());
+        }
+        return keyList;
+    }
+
     public String generatePresignedUrl(String fileName) {
 
         logger.info(() -> String.format("Generating Presigned Url for %s", fileName));
