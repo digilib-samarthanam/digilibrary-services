@@ -14,6 +14,8 @@ public class BookResponse {
     private Integer isbn;
     private String categoryName;
     private String categoryId;
+    private String subCategoryName;
+    private String subCategoryId;
     private String bookType;
     private String title;
     private String year;

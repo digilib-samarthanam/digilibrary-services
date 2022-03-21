@@ -29,6 +29,10 @@ public class Book implements Serializable {
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sub_category_id")
+    private SubCategory subCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_type_code")
     private BookTypeFormat bookTypeFormat;
 
