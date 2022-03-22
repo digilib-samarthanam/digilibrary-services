@@ -1,5 +1,12 @@
 package com.samarthanam.digitallibrary.service;
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
@@ -11,6 +18,9 @@ import com.samarthanam.digitallibrary.entity.Category;
 import com.samarthanam.digitallibrary.repository.*;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -28,10 +38,13 @@ import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,6 +55,9 @@ import static com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIM
 @Validated
 public class BookService {
     private static final BooksMapper booksMapper = Mappers.getMapper(BooksMapper.class);
+
+    @Autowired
+    private AmazonS3 amazonS3;
 
     @Autowired
     private BooksRepository booksRepository;
@@ -231,6 +247,68 @@ public class BookService {
         userBookmarksRepository.deleteByBookIsbn(isbn);
         userActivityHistoryRepository.deleteByBookIsbn(isbn);
         booksRepository.deleteById(isbn);
+    }
+
+    public void ReadDataFromExcel(){
+
+        try {
+//            FileInputStream file = new FileInputStream(new File(pathname));
+//            AmazonS3 s3Client = new AmazonS3Client(new ProfileCredentialsProvider());
+//            S3ObjectSummary objectListing = amazonS3.listObjects("samarthanam-personal-development","bulk_upload_books/DigitalLibraryExcel.xlsx").;
+
+            S3Object object = amazonS3.getObject(new GetObjectRequest("samarthanam-personal-development","bulk_upload_books/DigitalLibraryExcel.xlsx"));
+            InputStream objectData = object.getObjectContent();
+            XSSFWorkbook workbook = new XSSFWorkbook(objectData);
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+            rowIterator.next();
+
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                String authorName = row.getCell(0).getStringCellValue();
+                Integer isbn = ((int) row.getCell(1).getNumericCellValue());
+                String categoryName=row.getCell(2).getStringCellValue();
+                String bookType= row.getCell(3).getStringCellValue();
+                String title = row.getCell(4).getStringCellValue();
+                String year = String.valueOf((int)row.getCell(5).getNumericCellValue());
+                String countryOfOrigin = row.getCell(6).getStringCellValue();
+                String editionVersion =String.valueOf(row.getCell(7).getNumericCellValue());
+                Integer totalPages=(int)row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
+                Date totalAudioTime = row.getCell(9).getDateCellValue();
+                SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm:ss");
+                String audioTime;
+                if(totalAudioTime==null){
+                    audioTime=null;
+                }
+                else audioTime =formatTime.format(totalAudioTime);
+                String fileName = row.getCell(10).getStringCellValue();
+
+                BookRequest bookRequest = new BookRequest();
+                bookRequest.setAuthorName(authorName);
+                bookRequest.setIsbn(isbn);
+                bookRequest.setCategoryName(categoryName);
+                bookRequest.setBookType(BookType.valueOf(bookType));
+                bookRequest.setTitle(title);
+                bookRequest.setYear(year);
+                bookRequest.setCountryOfOrigin(countryOfOrigin);
+                bookRequest.setEditionVersion(editionVersion);
+                if(totalPages==0){
+                    bookRequest.setTotalPages(null);
+                }
+                else{
+                bookRequest.setTotalPages(totalPages);
+                }
+                bookRequest.setTotalAudioTime(audioTime);
+
+                bookRequest.setFileName(fileName);
+
+                createBook(bookRequest);
+            }
+            workbook.close();
+        } catch (IOException e) {
+            log.error("Error reading file");
+            e.printStackTrace();
+        }
     }
 
 }

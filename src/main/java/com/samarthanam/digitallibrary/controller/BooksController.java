@@ -143,4 +143,8 @@ public class BooksController {
         bookService.deleteBook(isbn);
     }
 
+    @GetMapping("/upload")
+    public void BulkUpload(){
+        bookService.ReadDataFromExcel();
+    }
 }

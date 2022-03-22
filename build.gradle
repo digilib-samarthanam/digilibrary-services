@@ -49,4 +49,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk
 	implementation group: 'com.amazonaws', name: 'aws-java-sdk', version: "${awsSDKVersion}"
 
+	// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+
+
 }
