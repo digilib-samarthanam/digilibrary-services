@@ -4,10 +4,7 @@ import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
-import com.samarthanam.digitallibrary.entity.Author;
-import com.samarthanam.digitallibrary.entity.Book;
-import com.samarthanam.digitallibrary.entity.BookTypeFormat;
-import com.samarthanam.digitallibrary.entity.Category;
+import com.samarthanam.digitallibrary.entity.*;
 import com.samarthanam.digitallibrary.repository.*;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +53,9 @@ public class BookService {
     private CategoriesRepository categoriesRepository;
 
     @Autowired
+    private SubCategoriesRepository subCategoriesRepository;
+
+    @Autowired
     private AuthorsRepository authorsRepository;
 
     @Autowired
@@ -89,6 +89,7 @@ public class BookService {
         var books = bookType == null ? booksRepository.findByOrderByCreatedTimestampDesc(PageRequest.of(page, perPage))
                 : booksRepository.findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(bookType, PageRequest.of(page, perPage));
 
+        log.info(books.toString());
         return books.stream()
                 .map(bookEntity -> {
                     BookResponse book = booksMapper.map(bookEntity);
@@ -101,6 +102,14 @@ public class BookService {
 
     public List<Category> getBookCategories(int page, int perPage) {
         return categoriesRepository.findAllByOrderByCategoryName(PageRequest.of(page, perPage));
+    }
+
+    public List<SubCategory> getBookSubCategories(int page, int perPage) {
+        return subCategoriesRepository.findAllByOrderBySubCategoryName(PageRequest.of(page, perPage));
+    }
+
+    public List<SubCategory> getBookSubCategoriesUnderCategory(int page, int perPage, int categoryId) {
+        return subCategoriesRepository.findByCategoryCategoryIdOrderBySubCategoryName(PageRequest.of(page, perPage),categoryId);
     }
 
     public List<Author> getAuthors(int page, int perPage) {
@@ -206,6 +215,14 @@ public class BookService {
                                                                 .createdTimestamp(LocalDateTime.now(INDIA_TIME_ZONE))
                                                                 .build()));
         book.setCategory(category);
+
+        var subCategory = subCategoriesRepository.findFirstBySubCategoryNameIgnoreCase(bookRequest.getSubCategoryName())
+                .orElseGet(() -> subCategoriesRepository.save(SubCategory.builder()
+                        .subCategoryName(bookRequest.getSubCategoryName())
+                        .category(category)
+                        .createdTimestamp(LocalDateTime.now(INDIA_TIME_ZONE))
+                        .build()));
+        book.setSubCategory(subCategory);
 
         book.setCreatedTimestamp(createdTimestamp);
         book.setBookTypeFormat(bookTypes.get(bookRequest.getBookType()));

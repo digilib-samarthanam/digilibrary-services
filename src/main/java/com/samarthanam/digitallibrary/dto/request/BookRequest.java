@@ -20,6 +20,9 @@ public class BookRequest {
     @NotBlank
     private String categoryName;
 
+    @NotBlank
+    private String subCategoryName;
+
     @NotNull
     private BookType bookType;
 
