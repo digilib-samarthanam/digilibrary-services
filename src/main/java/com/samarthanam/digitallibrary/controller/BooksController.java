@@ -9,6 +9,7 @@ import com.samarthanam.digitallibrary.dto.response.BookResponse;
 import com.samarthanam.digitallibrary.dto.response.HomePageResponse;
 import com.samarthanam.digitallibrary.entity.Author;
 import com.samarthanam.digitallibrary.entity.Category;
+import com.samarthanam.digitallibrary.entity.SubCategory;
 import com.samarthanam.digitallibrary.service.BookService;
 import com.samarthanam.digitallibrary.service.UsersBookService;
 import io.swagger.annotations.ApiOperation;
@@ -110,6 +111,23 @@ public class BooksController {
             @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
         return bookService.getBookCategories(page, perPage);
+    }
+
+    @GetMapping("/book_sub_categories")
+    public List<SubCategory> getBookSubCategories(
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
+
+        return bookService.getBookSubCategories(page, perPage);
+    }
+
+    @GetMapping("/book_sub_categories/{categoryId}")
+    public List<SubCategory> getBookSubCategoriesByCategoryId(
+            @PathVariable @Positive Integer categoryId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
+
+        return bookService.getBookSubCategoriesUnderCategory(page, perPage,categoryId);
     }
 
     @GetMapping("/authors")

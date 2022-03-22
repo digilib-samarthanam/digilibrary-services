@@ -22,6 +22,8 @@ public interface BooksMapper {
     @Mapping(target = "authorName", source = "author.name")
     @Mapping(target = "categoryId", source = "category.categoryId")
     @Mapping(target = "categoryName", source = "category.categoryName")
+    @Mapping(target = "subCategoryId", source = "subCategory.subCategoryId")
+    @Mapping(target = "subCategoryName", source = "subCategory.subCategoryName")
     @Mapping(target = "bookType", expression = "java(book.getBookTypeFormat().getBookTypeDescription().toString())")
     @Mapping(target = "thumbnailUrl", ignore = true)
     BookResponse map(Book book);
