@@ -127,7 +127,7 @@ public class BooksController {
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
-        return bookService.getBookSubCategoriesUnderCategory(page, perPage,categoryId);
+        return bookService.getBookSubCategoriesUnderCategory(page, perPage, categoryId);
     }
 
     @GetMapping("/authors")
@@ -148,7 +148,7 @@ public class BooksController {
     @PutMapping("/books/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createBook(@PathVariable @Positive Integer isbn,
-            @RequestBody BookRequest bookRequest) {
+                           @RequestBody BookRequest bookRequest) {
 
         bookRequest.setIsbn(isbn);
         bookService.updateBook(bookRequest);
@@ -161,8 +161,17 @@ public class BooksController {
         bookService.deleteBook(isbn);
     }
 
-    @GetMapping("/upload")
-    public void BulkUpload(){
+
+    @PostMapping("/books/upload")
+    public void BulkUpload() {
         bookService.ReadDataFromExcel();
+    }
+
+    @GetMapping("/books/{sub_category_id}")
+    public List<BookResponse> listBooksInASubCategory(@PathVariable("sub_category_id") @Positive Integer subCategoryId,
+                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                      @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
+
+        return bookService.getAllBooksBySubCategory(subCategoryId, page, perPage);
     }
 }
