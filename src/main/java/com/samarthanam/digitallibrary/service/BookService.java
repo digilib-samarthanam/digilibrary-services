@@ -1,5 +1,10 @@
 package com.samarthanam.digitallibrary.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
@@ -8,8 +13,15 @@ import com.samarthanam.digitallibrary.entity.*;
 import com.samarthanam.digitallibrary.repository.*;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +37,20 @@ import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE;
+import static org.apache.poi.ss.usermodel.CellType.*;
+import static org.apache.poi.ss.usermodel.CellType.STRING;
 
 @Service
 @Slf4j
@@ -42,6 +60,12 @@ public class BookService {
 
     @Autowired
     private BooksRepository booksRepository;
+
+    @Autowired
+    private AmazonS3 amazonS3;
+
+    @Value("${s3.bucket.name}")
+    private String bucketName;
 
     @Autowired
     private UserBookmarksRepository userBookmarksRepository;
@@ -101,15 +125,18 @@ public class BookService {
     }
 
     public List<Category> getBookCategories(int page, int perPage) {
-        return categoriesRepository.findAllByOrderByCategoryName(PageRequest.of(page, perPage));
+        List<Category> categories = categoriesRepository.findAllByOrderByCategoryName(PageRequest.of(page, perPage));
+        return categories;
     }
 
     public List<SubCategory> getBookSubCategories(int page, int perPage) {
-        return subCategoriesRepository.findAllByOrderBySubCategoryName(PageRequest.of(page, perPage));
+        List<SubCategory> subCategories = subCategoriesRepository.findAllByOrderBySubCategoryName(PageRequest.of(page, perPage));
+        return subCategories;
     }
 
     public List<SubCategory> getBookSubCategoriesUnderCategory(int page, int perPage, int categoryId) {
-        return subCategoriesRepository.findByCategoryCategoryIdOrderBySubCategoryName(PageRequest.of(page, perPage),categoryId);
+        List<SubCategory> subCategories = subCategoriesRepository.findByCategoryCategoryIdOrderBySubCategoryName(PageRequest.of(page, perPage),categoryId);
+        return subCategories;
     }
 
     public List<Author> getAuthors(int page, int perPage) {
@@ -216,7 +243,7 @@ public class BookService {
                                                                 .build()));
         book.setCategory(category);
 
-        var subCategory = subCategoriesRepository.findFirstBySubCategoryNameIgnoreCase(bookRequest.getSubCategoryName())
+        var subCategory = subCategoriesRepository.findFirstBySubCategoryNameIgnoreCaseAndCategoryCategoryId(bookRequest.getSubCategoryName(),category.getCategoryId())
                 .orElseGet(() -> subCategoriesRepository.save(SubCategory.builder()
                         .subCategoryName(bookRequest.getSubCategoryName())
                         .category(category)
@@ -248,6 +275,134 @@ public class BookService {
         userBookmarksRepository.deleteByBookIsbn(isbn);
         userActivityHistoryRepository.deleteByBookIsbn(isbn);
         booksRepository.deleteById(isbn);
+    }
+
+    public List<BookResponse> getAllBooksBySubCategory(int sub_category_id, int page, int perPage) {
+
+        log.info("Querying books under sub_category_id" + sub_category_id + "from database");
+        var books = booksRepository.findBySubCategorySubCategoryIdOrderByCreatedTimestampDesc(sub_category_id, PageRequest.of(page, perPage));
+
+        log.info(books.toString());
+        return books.stream()
+                .map(bookEntity -> {
+                    BookResponse book = booksMapper.map(bookEntity);
+                    book.setThumbnailUrl(awsCloudService.generatePresignedUrl(
+                            bookEntity.getThumbnailFileName()));
+                    return book;
+                })
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public void ReadDataFromExcel(String fileName) {
+
+        try {
+            S3Object object = amazonS3.getObject(new GetObjectRequest(bucketName, "bulk_upload_books/"+fileName));
+            InputStream objectData = object.getObjectContent();
+
+            XSSFWorkbook workbook = new XSSFWorkbook(objectData);
+            ExecutorService asyncExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            List<Future<?>> futures = new ArrayList<Future<?>>();
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+            rowIterator.next();
+
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                Future<?> f = asyncExecutor.submit(() -> {
+                                process(row);
+                            }
+                    );
+                    futures.add(f);
+
+            }
+
+            for(Future<?> future : futures)
+                future.get();
+            boolean allDone = true;
+            for(Future<?> future : futures){
+                allDone &= future.isDone(); // check if future is done
+            }
+            if(allDone){
+//                FileOutputStream out = new FileOutputStream(new File("/Downloads/DigitalLibraryResult.xlsx"));
+//                workbook.write(out);
+//                Long contentLength = Long.valueOf(byteArrayOutputStream.toByteArray().length);
+
+//                ObjectMetadata objectMetaData =new ObjectMetadata();
+//                amazonS3.putObject("samarthanam-personal-development", "bulk_upload_books_status/DigitalLibrary2.xlsx", objectData);
+                workbook.close();
+            }
+
+        } catch (IOException e) {
+            log.error("Error reading file");
+            e.printStackTrace();
+        } catch (AmazonS3Exception e){
+            log.error("Bulk Upload file not found in S3");
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void process(Row row){
+
+        try{
+            String authorName = row.getCell(0).getStringCellValue();
+            Integer isbn = ((int) row.getCell(1).getNumericCellValue());
+            String categoryName = row.getCell(2).getStringCellValue();
+            String subCategory = row.getCell(3).getStringCellValue();
+            String bookType = row.getCell(4).getStringCellValue();
+            String title = row.getCell(5).getStringCellValue();
+            String year = String.valueOf((int) row.getCell(6).getNumericCellValue());
+            String countryOfOrigin = row.getCell(7).getStringCellValue();
+            String editionVersion = String.valueOf(row.getCell(8).getNumericCellValue());
+            Integer totalPages = (int) row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
+            Date totalAudioTime = row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getDateCellValue();
+            SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm:ss");
+            String audioTime;
+            if (totalAudioTime == null) {
+                audioTime = null;
+            } else audioTime = formatTime.format(totalAudioTime);
+            String fileName = row.getCell(11).getStringCellValue();
+            if(isFilePresent(fileName)) {
+                BookRequest bookRequest = new BookRequest();
+                bookRequest.setAuthorName(authorName);
+                bookRequest.setIsbn(isbn);
+                bookRequest.setCategoryName(categoryName);
+                bookRequest.setSubCategoryName(subCategory);
+                bookRequest.setBookType(BookType.valueOf(bookType));
+                bookRequest.setTitle(title);
+                bookRequest.setYear(year);
+                bookRequest.setCountryOfOrigin(countryOfOrigin);
+                bookRequest.setEditionVersion(editionVersion);
+                if (totalPages == 0) {
+                    bookRequest.setTotalPages(null);
+                } else {
+                    bookRequest.setTotalPages(totalPages);
+                }
+                bookRequest.setTotalAudioTime(audioTime);
+
+                bookRequest.setFileName(fileName);
+                createBook(bookRequest);
+                row.createCell(12, STRING);
+                row.getCell(12).setCellValue("Success");
+            }else throw new FileNotFoundException("The file does not exist in S3 bucket");
+        }catch(Exception e){
+            log.info(e.getMessage());
+            row.createCell(12, STRING);
+            row.getCell(12).setCellValue("Failure");
+            row.createCell(13, STRING);
+            row.getCell(13).setCellValue(e.getMessage());
+        }
+
+    }
+
+    public boolean isFilePresent(String fileName){
+        String prefix = "";
+        List<String> files = awsCloudService.getFiles(bucketName,prefix);
+        fileName = prefix+fileName;
+        return files.contains(fileName);
     }
 
 }
