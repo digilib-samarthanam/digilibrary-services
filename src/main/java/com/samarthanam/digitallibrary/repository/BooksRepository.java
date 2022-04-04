@@ -18,4 +18,7 @@ public interface BooksRepository extends JpaRepository<Book, Integer> {
     @EntityGraph(attributePaths = {"author", "category", "bookTypeFormat", "subCategory"})
     List<Book> findByBookTypeFormatBookTypeDescriptionOrderByCreatedTimestampDesc(BookType bookType, Pageable pageRequest);
 
+    @EntityGraph(attributePaths = {"author", "category", "bookTypeFormat", "subCategory"})
+    List<Book> findBySubCategorySubCategoryIdOrderByCreatedTimestampDesc(Integer subCategoryId, Pageable pageRequest);
+
 }

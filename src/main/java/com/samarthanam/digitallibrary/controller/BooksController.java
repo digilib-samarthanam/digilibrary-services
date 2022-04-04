@@ -161,4 +161,16 @@ public class BooksController {
         bookService.deleteBook(isbn);
     }
 
+    @GetMapping("/books/{sub_category_id}")
+    public List<BookResponse> listBooksInASubCategory(@PathVariable("sub_category_id") @Positive Integer subCategoryId,
+                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                      @RequestParam(name = "per_page", required = false, defaultValue = "10") int perPage) {
+
+        return bookService.getAllBooksBySubCategory(subCategoryId, page, perPage);
+    }
+
+    @PostMapping("/books/upload/{fileName}")
+    public void BulkUpload(@PathVariable String fileName) {
+        bookService.ReadDataFromExcel(fileName);
+    }
 }
