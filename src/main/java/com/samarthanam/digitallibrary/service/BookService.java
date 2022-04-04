@@ -1,10 +1,9 @@
 package com.samarthanam.digitallibrary.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.*;
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
@@ -13,9 +12,6 @@ import com.samarthanam.digitallibrary.entity.*;
 import com.samarthanam.digitallibrary.repository.*;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -49,7 +45,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE;
-import static org.apache.poi.ss.usermodel.CellType.*;
 import static org.apache.poi.ss.usermodel.CellType.STRING;
 
 @Service
@@ -323,12 +318,16 @@ public class BookService {
                 allDone &= future.isDone(); // check if future is done
             }
             if(allDone){
-//                FileOutputStream out = new FileOutputStream(new File("/Downloads/DigitalLibraryResult.xlsx"));
-//                workbook.write(out);
-//                Long contentLength = Long.valueOf(byteArrayOutputStream.toByteArray().length);
-
-//                ObjectMetadata objectMetaData =new ObjectMetadata();
-//                amazonS3.putObject("samarthanam-personal-development", "bulk_upload_books_status/DigitalLibrary2.xlsx", objectData);
+                File outputFile = new File(fileName);
+                FileOutputStream fos = new FileOutputStream(outputFile);
+                workbook.write(fos);
+                try{
+                    final PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, "bulk_upload_books_status/upload_status_"+fileName, outputFile);
+                    amazonS3.putObject(putObjectRequest);
+                    outputFile.delete();
+                }catch(Exception e){
+                    log.info("error uploading status file to s3");
+                }
                 workbook.close();
             }
 
@@ -365,7 +364,7 @@ public class BookService {
                 audioTime = null;
             } else audioTime = formatTime.format(totalAudioTime);
             String fileName = row.getCell(11).getStringCellValue();
-            if(isFilePresent(fileName)) {
+            if(isFilePresent(fileName,bookType)) {
                 BookRequest bookRequest = new BookRequest();
                 bookRequest.setAuthorName(authorName);
                 bookRequest.setIsbn(isbn);
@@ -398,8 +397,12 @@ public class BookService {
 
     }
 
-    public boolean isFilePresent(String fileName){
+    public boolean isFilePresent(String fileName,String bookType){
         String prefix = "";
+        if(bookType.equals("PDF"))
+            fileName += ".pdf";
+        else
+            fileName += ".mp3";
         List<String> files = awsCloudService.getFiles(bucketName,prefix);
         fileName = prefix+fileName;
         return files.contains(fileName);
