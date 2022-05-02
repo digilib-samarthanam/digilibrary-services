@@ -3,10 +3,7 @@ package com.samarthanam.digitallibrary.controller;
 import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
-import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
-import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
-import com.samarthanam.digitallibrary.dto.response.BookResponse;
-import com.samarthanam.digitallibrary.dto.response.HomePageResponse;
+import com.samarthanam.digitallibrary.dto.response.*;
 import com.samarthanam.digitallibrary.entity.Author;
 import com.samarthanam.digitallibrary.entity.Category;
 import com.samarthanam.digitallibrary.entity.SubCategory;
@@ -106,7 +103,7 @@ public class BooksController {
     }
 
     @GetMapping("/book_categories")
-    public List<Category> getBookCategories(
+    public List<CategoryResponseDto> getBookCategories(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
@@ -114,7 +111,7 @@ public class BooksController {
     }
 
     @GetMapping("/book_sub_categories")
-    public List<SubCategory> getBookSubCategories(
+    public List<SubCategoryResponseDto> getBookSubCategories(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {
 
@@ -122,7 +119,7 @@ public class BooksController {
     }
 
     @GetMapping("/book_sub_categories/{categoryId}")
-    public List<SubCategory> getBookSubCategoriesByCategoryId(
+    public List<SubCategoryResponseDto> getBookSubCategoriesByCategoryId(
             @PathVariable @Positive Integer categoryId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "per_page", required = false, defaultValue = "2147483647") int perPage) {

@@ -1,12 +1,8 @@
 package com.samarthanam.digitallibrary.service.mapper;
 
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
-import com.samarthanam.digitallibrary.dto.response.BookActivityStatusRequest;
-import com.samarthanam.digitallibrary.dto.response.BookResponse;
-import com.samarthanam.digitallibrary.dto.response.BookActivityStatus;
-import com.samarthanam.digitallibrary.entity.Book;
-import com.samarthanam.digitallibrary.entity.UserActivityHistory;
-import com.samarthanam.digitallibrary.entity.UserBookmarks;
+import com.samarthanam.digitallibrary.dto.response.*;
+import com.samarthanam.digitallibrary.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -27,6 +23,18 @@ public interface BooksMapper {
     @Mapping(target = "bookType", expression = "java(book.getBookTypeFormat().getBookTypeDescription().toString())")
     @Mapping(target = "thumbnailUrl", ignore = true)
     BookResponse map(Book book);
+
+    @Mapping(target = "subCategoryId", source = "subCategory.subCategoryId")
+    @Mapping(target = "subCategoryName", source = "subCategory.subCategoryName")
+    @Mapping(target = "booksCount", ignore = true)
+    @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
+    SubCategoryResponseDto map(SubCategory subCategory);
+
+    @Mapping(target = "categoryId", source = "category.categoryId")
+    @Mapping(target = "categoryName", source = "category.categoryName")
+    @Mapping(target = "booksCount", ignore = true)
+    @Mapping(target = "createdTimestamp", expression = "java(java.time.LocalDateTime.now(com.samarthanam.digitallibrary.constant.ServiceConstants.INDIA_TIME_ZONE))")
+    CategoryResponseDto map(Category category);
 
     BookActivityStatus map(UserActivityHistory userActivityHistory);
 

@@ -32,7 +32,5 @@ public class SubCategory {
     @Column(name = "create_ts")
     private LocalDateTime createdTimestamp;
 
-    @Formula("(SELECT COUNT(*) FROM book b WHERE b.sub_category_id= sub_category_id)")
-    private Long booksCount;
 
 }
