@@ -8,6 +8,8 @@ import com.samarthanam.digitallibrary.constant.BookType;
 import com.samarthanam.digitallibrary.dto.request.BookRequest;
 import com.samarthanam.digitallibrary.dto.request.SearchBooksCriteria;
 import com.samarthanam.digitallibrary.dto.response.BookResponse;
+import com.samarthanam.digitallibrary.dto.response.CategoryResponseDto;
+import com.samarthanam.digitallibrary.dto.response.SubCategoryResponseDto;
 import com.samarthanam.digitallibrary.entity.*;
 import com.samarthanam.digitallibrary.repository.*;
 import com.samarthanam.digitallibrary.service.mapper.BooksMapper;
@@ -119,19 +121,42 @@ public class BookService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Category> getBookCategories(int page, int perPage) {
+    public List<CategoryResponseDto> getBookCategories(int page, int perPage) {
         List<Category> categories = categoriesRepository.findAllByOrderByCategoryName(PageRequest.of(page, perPage));
-        return categories;
+        log.info(categories.toString());
+        return categories.stream()
+                .map(categoryEntity -> {
+                    CategoryResponseDto category = booksMapper.map(categoryEntity);
+                    category.setBooksCount(booksRepository.countByCategoryCategoryId(categoryEntity.getCategoryId()));
+                    return category;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<SubCategory> getBookSubCategories(int page, int perPage) {
+    public List<SubCategoryResponseDto> getBookSubCategories(int page, int perPage) {
         List<SubCategory> subCategories = subCategoriesRepository.findAllByOrderBySubCategoryName(PageRequest.of(page, perPage));
-        return subCategories;
+        log.info(subCategories.toString());
+        return subCategories.stream()
+                .map(subCategoryEntity -> {
+                    SubCategoryResponseDto subCategory = booksMapper.map(subCategoryEntity);
+                    subCategory.setBooksCount(booksRepository.countBySubCategorySubCategoryId(subCategoryEntity.getSubCategoryId()));
+                    return subCategory;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<SubCategory> getBookSubCategoriesUnderCategory(int page, int perPage, int categoryId) {
+    public List<SubCategoryResponseDto> getBookSubCategoriesUnderCategory(int page, int perPage, int categoryId) {
+        log.info("Querying books under category_id" + categoryId + "from database");
         List<SubCategory> subCategories = subCategoriesRepository.findByCategoryCategoryIdOrderBySubCategoryName(PageRequest.of(page, perPage),categoryId);
-        return subCategories;
+
+        log.info(subCategories.toString());
+        return subCategories.stream()
+                .map(subCategoryEntity -> {
+                    SubCategoryResponseDto subCategory = booksMapper.map(subCategoryEntity);
+                    subCategory.setBooksCount(booksRepository.countBySubCategorySubCategoryId(subCategoryEntity.getSubCategoryId()));
+                    return subCategory;
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<Author> getAuthors(int page, int perPage) {
