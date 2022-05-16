@@ -233,18 +233,18 @@ public class BookService {
     private void saveBook(@Valid BookRequest bookRequest, LocalDateTime createdTimestamp) {
 
         switch (bookRequest.getBookType()) {
-            case PDF:
+            case BOOK:
                 if (bookRequest.getTotalAudioTime() != null)
-                    throw new ValidationException("PDF Books can not have total_audio_time");
+                    throw new ValidationException("Books can not have total_audio_time");
                 else if (bookRequest.getTotalPages() == null)
-                    throw new ValidationException("PDF Books must have total_pages");
+                    throw new ValidationException("Books must have total_pages");
                 break;
 
-            case AUDIO_BOOK:
+            case AUDIBLE:
                 if (bookRequest.getTotalPages() != null)
-                    throw new ValidationException("Audio Books can not have total_pages");
+                    throw new ValidationException("Audibles can not have total_pages");
                 else if (bookRequest.getTotalAudioTime() == null)
-                    throw new ValidationException("Audio Books must have total_audio_time");
+                    throw new ValidationException("Audibles must have total_audio_time");
         }
 
         var book = booksMapper.map(bookRequest);
@@ -424,7 +424,7 @@ public class BookService {
 
     public boolean isFilePresent(String fileName,String bookType){
         String prefix = "";
-        if(bookType.equals("PDF"))
+        if(bookType.equals(BookType.BOOK))
             fileName += ".pdf";
         else
             fileName += ".mp3";

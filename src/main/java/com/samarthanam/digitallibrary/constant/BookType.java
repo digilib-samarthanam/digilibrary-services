@@ -1,8 +1,8 @@
 package com.samarthanam.digitallibrary.constant;
 
 public enum BookType {
-    PDF("PDF", ".pdf"),
-    AUDIO_BOOK("Audio Book", ".mp3");
+    BOOK("BOOK", ".pdf"),
+    AUDIBLE("AUDIBLE", ".mp3");
 
     private String value;
     private String fileExtension;
