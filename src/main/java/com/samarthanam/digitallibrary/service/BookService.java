@@ -347,7 +347,7 @@ public class BookService {
                 FileOutputStream fos = new FileOutputStream(outputFile);
                 workbook.write(fos);
                 try{
-                    final PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, "bulk_upload_books_status/upload_status_"+fileName, outputFile);
+                    final PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, "bulk_upload_status/upload_status_"+fileName, outputFile);
                     amazonS3.putObject(putObjectRequest);
                     outputFile.delete();
                 }catch(Exception e){
