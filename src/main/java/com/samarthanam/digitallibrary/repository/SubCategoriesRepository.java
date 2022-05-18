@@ -15,9 +15,9 @@ public interface SubCategoriesRepository extends JpaRepository<SubCategory, Inte
 
     @EntityGraph(attributePaths = { "category.categoryId"})
     List<SubCategory> findAllByOrderBySubCategoryName(Pageable pageRequest);
-    Optional<SubCategory> findFirstBySubCategoryNameIgnoreCase(String subCategoryName);
+    @EntityGraph(attributePaths = { "category.categoryId"})
+    Optional<SubCategory> findFirstBySubCategoryNameIgnoreCaseAndCategoryCategoryId(String subCategoryName, Integer categoryId);
 
     @EntityGraph(attributePaths = { "category.categoryId"})
     List<SubCategory> findByCategoryCategoryIdOrderBySubCategoryName(Pageable pageRequest, Integer categoryId);
-
 }
