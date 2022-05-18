@@ -424,7 +424,7 @@ public class BookService {
 
     public boolean isFilePresent(String fileName,String bookType){
         String prefix = "";
-        if(bookType.equals(BookType.BOOK))
+        if(bookType.equals(BookType.BOOK.toString()))
             fileName += ".pdf";
         else
             fileName += ".mp3";
